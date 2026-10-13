@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.MetricsDashboardPage"
+             Title="Health Metrics">
+
+    <Grid>
+        <ScrollView>
+                <StackLayout Padding="16,16,16,80" Spacing="12">
+                    <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}"/>
+                    <CollectionView ItemsSource="{Binding Summaries}">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="2"
+                                            HorizontalItemSpacing="10" VerticalItemSpacing="10"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid BackgroundColor="Transparent">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnMetricTapped" CommandParameter="{Binding .}"/>
+                                    </Grid.GestureRecognizers>
+                                    <Frame BorderColor="#E8EFF7" CornerRadius="14" Padding="14"
+                                           BackgroundColor="White" HasShadow="True" InputTransparent="True">
+                                        <StackLayout Spacing="5">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Label Grid.Column="0" Text="{Binding Icon}" FontSize="20"
+                                                       VerticalOptions="Center"/>
+                                                <Label Grid.Column="1" Text="{Binding DisplayName}"
+                                                       FontSize="11" FontAttributes="Bold" TextColor="#8C9EAD"
+                                                       VerticalOptions="Center" Margin="6,0,0,0"
+                                                       LineBreakMode="TailTruncation"/>
+                                            </Grid>
+                                            <Label Text="{Binding LatestValueText}" FontSize="22"
+                                                   FontAttributes="Bold" Margin="0,4,0,0"
+                                                   TextColor="{Binding AccentColor, Converter={StaticResource HexColorConverter}}"
+                                                   LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding Unit}" FontSize="12" TextColor="#8C9EAD"/>
+                                            <Label Text="{Binding TrendText}" FontSize="11" TextColor="#7F8C8D"
+                                                   IsVisible="{Binding HasTrend}" Margin="0,2,0,0"/>
+                                            <Label Text="No data yet" FontSize="11" TextColor="#B0BEC5"
+                                                   FontAttributes="Italic"
+                                                   IsVisible="{Binding HasData, Converter={StaticResource InverseBoolConverter}}"/>
+                                        </StackLayout>
+                                    </Frame>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+        </ScrollView>
+
+        <!-- FAB overlaid on top via ZIndex -->
+        <Button Text="+" FontSize="24" WidthRequest="56" HeightRequest="56"
+                CornerRadius="28" BackgroundColor="#1B5FA8" TextColor="White"
+                HorizontalOptions="End" VerticalOptions="End" Margin="16"
+                ZIndex="10"
+                Clicked="OnAddClicked"/>
+    </Grid>
+</ContentPage>

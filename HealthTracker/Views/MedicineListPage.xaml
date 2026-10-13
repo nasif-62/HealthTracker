@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.MedicineListPage"
+             Title="Medicines">
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+                <StackLayout>
+                    <!-- Pending Review (from prescription scan) -->
+                    <StackLayout IsVisible="{Binding HasPendingMedicines}" Padding="12,8,12,0">
+                        <Label Text="Pending Review" FontAttributes="Bold" FontSize="15" TextColor="#E67E22" Margin="0,4,0,4"/>
+                        <Label Text="Scanned from prescription — tap to review and add" FontSize="12" TextColor="#5A7A9A" Margin="0,0,0,4"/>
+                        <CollectionView ItemsSource="{Binding PendingMedicines}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <SwipeView>
+                                        <SwipeView.RightItems>
+                                            <SwipeItems>
+                                                <SwipeItem Text="Dismiss" BackgroundColor="#922B21"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DismissPendingCommand}"
+                                                           CommandParameter="{Binding .}" />
+                                            </SwipeItems>
+                                        </SwipeView.RightItems>
+                                        <Frame BorderColor="#E67E22" Margin="0,4" CornerRadius="10" Padding="14" BackgroundColor="#FFF8E1">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnPendingTapped" CommandParameter="{Binding .}"/>
+                                            </Frame.GestureRecognizers>
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                <StackLayout Grid.Column="0" Spacing="2">
+                                                    <Label Text="{Binding Name}" FontSize="15" FontAttributes="Bold" TextColor="#0D1B2A"/>
+                                                    <Label FontSize="11" TextColor="#5A7A9A">
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span Text="{Binding Dosage}"/>
+                                                                <Span Text=" "/>
+                                                                <Span Text="{Binding Frequency}"/>
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                </StackLayout>
+                                                <Label Grid.Column="1" Text="Review" FontSize="12"
+                                                       TextColor="#E67E22" FontAttributes="Bold" VerticalOptions="Center"/>
+                                            </Grid>
+                                        </Frame>
+                                    </SwipeView>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+
+                    <!-- Active Medicines -->
+                    <CollectionView ItemsSource="{Binding Medicines}" EmptyView="No active medicines.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <SwipeView>
+                                    <SwipeView.RightItems>
+                                        <SwipeItems>
+                                            <SwipeItem Text="Delete" BackgroundColor="Red"
+                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
+                                                       CommandParameter="{Binding .}" />
+                                        </SwipeItems>
+                                    </SwipeView.RightItems>
+                                    <Grid Margin="12,5" BackgroundColor="Transparent">
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnMedicineTapped" CommandParameter="{Binding .}"/>
+                                            <DragGestureRecognizer
+                                                DragStartingCommand="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DragStartedCommand}"
+                                                DragStartingCommandParameter="{Binding .}"/>
+                                            <DropGestureRecognizer
+                                                DropCommand="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DropCommand}"
+                                                DropCommandParameter="{Binding .}"/>
+                                        </Grid.GestureRecognizers>
+                                        <Frame BorderColor="#C8D8EA" CornerRadius="10" Padding="14" InputTransparent="True">
+                                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                                <Label Grid.Column="0" Text="☰" FontSize="18" TextColor="#C8D8EA"
+                                                       VerticalOptions="Center"/>
+                                                <StackLayout Grid.Column="1" Spacing="8">
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <Label Grid.Column="0" FontSize="16" FontAttributes="Bold" TextColor="#0D1B2A" VerticalOptions="Center">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="{Binding StockUnitIcon}"/>
+                                                                    <Span Text=" "/>
+                                                                    <Span Text="{Binding Medicine.Name}" FontAttributes="Bold"/>
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                        <Label Grid.Column="1" Text="⚠ Low Stock"
+                                                               TextColor="{Binding StockWarningColor, Converter={StaticResource HexColorConverter}}"
+                                                               FontSize="11" FontAttributes="Bold" VerticalOptions="Center"
+                                                               IsVisible="{Binding IsLowStock}"/>
+                                                    </Grid>
+                                                    <ProgressBar Progress="{Binding DoseProgress}"
+                                                                 ProgressColor="{Binding ProgressColor, Converter={StaticResource HexColorConverter}}"
+                                                                 HeightRequest="6"/>
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <Label Grid.Column="0" Text="{Binding DoseProgressText}"
+                                                               FontSize="11" TextColor="#5A7A9A"/>
+                                                        <Label Grid.Column="1" Text="{Binding Medicine.StockCount, StringFormat='Stock: {0}'}"
+                                                               FontSize="11" TextColor="#5A7A9A"/>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="*,*" Margin="0,2,0,0">
+                                                        <Label Grid.Column="0" Text="{Binding StreakText}"
+                                                               FontSize="11" FontAttributes="Bold" TextColor="#E67E22"
+                                                               IsVisible="{Binding ShowStreak}"/>
+                                                        <Label Grid.Column="1" Text="{Binding MissedText}"
+                                                               FontSize="11" FontAttributes="Bold" TextColor="#C0392B"
+                                                               IsVisible="{Binding ShowMissed}" HorizontalOptions="End"/>
+                                                    </Grid>
+                                                </StackLayout>
+                                            </Grid>
+                                        </Frame>
+                                    </Grid>
+                                </SwipeView>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Past Medicines -->
+                    <StackLayout IsVisible="{Binding HasPastMedicines}" Padding="12,8,12,0">
+                        <Label Text="Past Medicines" FontAttributes="Bold" FontSize="15" TextColor="#5A7A9A" Margin="0,8,0,4"/>
+                        <CollectionView ItemsSource="{Binding PastMedicines}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <SwipeView>
+                                        <SwipeView.RightItems>
+                                            <SwipeItems>
+                                                <SwipeItem Text="Delete" BackgroundColor="Red"
+                                                           Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
+                                                           CommandParameter="{Binding .}" />
+                                            </SwipeItems>
+                                        </SwipeView.RightItems>
+                                        <Frame BorderColor="#E0EAF4" Margin="0,4" CornerRadius="10" Padding="14" BackgroundColor="#F8FBFF">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnMedicineTapped" CommandParameter="{Binding .}"/>
+                                            </Frame.GestureRecognizers>
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <StackLayout Grid.Column="0" Spacing="4">
+                                                    <Label Text="{Binding Medicine.Name}" FontSize="15" FontAttributes="Bold" TextColor="#5A7A9A"/>
+                                                    <Label Text="{Binding DoseProgressText}" FontSize="11" TextColor="#9AB0C8"/>
+                                                </StackLayout>
+                                                <Label Grid.Column="1" Text="Completed" FontSize="11"
+                                                       TextColor="#1A8A4A" FontAttributes="Bold" VerticalOptions="Center"/>
+                                            </Grid>
+                                        </Frame>
+                                    </SwipeView>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+                </StackLayout>
+        </ScrollView>
+
+        <Label Grid.Row="1" Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}" Padding="16,4"/>
+
+        <Button Grid.Row="0" Text="+" FontSize="24" WidthRequest="56" HeightRequest="56"
+                CornerRadius="28" BackgroundColor="#1B5FA8" TextColor="White"
+                HorizontalOptions="End" VerticalOptions="End" Margin="16"
+                Clicked="OnAddClicked"/>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.AddMedicinePage"
+             Title="Add Medicine">
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="12">
+            <Label Text="Medicine Name" FontAttributes="Bold"/>
+            <Entry Text="{Binding Name}" Placeholder="e.g. Metformin"/>
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                <Label Grid.Column="0" Text="Prescribed Days" FontAttributes="Bold" VerticalOptions="Center"/>
+                <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End" VerticalOptions="Center" Spacing="6">
+                    <Label Text="Ongoing" VerticalOptions="Center" TextColor="#5A7A9A"/>
+                    <CheckBox IsChecked="{Binding IsOngoing}" VerticalOptions="Center"/>
+                </StackLayout>
+            </Grid>
+            <Entry Text="{Binding PrescribedDaysText}" Placeholder="e.g. 30" Keyboard="Numeric"
+                   IsVisible="{Binding IsPrescribedDaysVisible}"/>
+
+            <Label Text="Stock" FontAttributes="Bold"/>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Entry Grid.Column="0" Text="{Binding StockText}" Placeholder="Count" Keyboard="Numeric"/>
+                <Picker Grid.Column="1" ItemsSource="{Binding StockUnitOptions}" SelectedItem="{Binding StockUnit}"/>
+            </Grid>
+            <Label Text="Start Date &amp; Time" FontAttributes="Bold"/>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <DatePicker Grid.Column="0" Date="{Binding StartDate}"/>
+                <TimePicker Grid.Column="1" Time="{Binding StartTime}"/>
+            </Grid>
+
+            <Label Text="Schedule Times" FontAttributes="Bold" Margin="0,8,0,0"/>
+            <CollectionView ItemsSource="{Binding Schedules}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,Auto" Padding="0,4" ColumnSpacing="8">
+                            <TimePicker Grid.Column="0" Time="{Binding Time}"/>
+                            <Button Grid.Column="1" Text="✕" BackgroundColor="Transparent" TextColor="Red"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveScheduleCommand}"
+                                    CommandParameter="{Binding .}"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Button Text="+ Add Time" Command="{Binding AddScheduleCommand}" BackgroundColor="Transparent"
+                    TextColor="#1B5FA8" BorderColor="#1B5FA8" BorderWidth="1"/>
+
+            <Label Text="Instructions (optional)" FontAttributes="Bold" Margin="0,8,0,0"/>
+            <Entry Text="{Binding Instructions}" Placeholder="e.g. Take with food"/>
+            <Label Text="Notes (optional)" FontAttributes="Bold"/>
+            <Entry Text="{Binding Notes}"/>
+
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}" FontSize="13"/>
+
+            <Button Text="Save Medicine" Command="{Binding SaveCommand}"
+                    BackgroundColor="#1B5FA8" TextColor="White" Margin="0,8,0,0"/>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

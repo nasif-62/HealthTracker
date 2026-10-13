@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.TodayPage"
+             Title="Today">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Medicines" Clicked="OnManageMedicinesClicked" Order="Primary" Priority="0"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Summary header -->
+        <Frame Grid.Row="0" Margin="12,10,12,4" Padding="16,14" CornerRadius="12" BorderColor="#C8D8EA">
+            <StackLayout Spacing="6">
+                <Label Text="{Binding TodayDate}" FontSize="12" TextColor="#5A7A9A"/>
+                <Label Text="{Binding SummaryText}" FontSize="17" FontAttributes="Bold" TextColor="#0D1B2A"/>
+                <ProgressBar Progress="{Binding DayProgress}" ProgressColor="#1A8A4A" HeightRequest="8"/>
+            </StackLayout>
+        </Frame>
+
+        <!-- Schedule list -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Items}" EmptyView="No medicines scheduled for today.&#x0a;Tap 'Medicines' to add one.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Outer Grid is the tap target for navigation -->
+                        <Grid Margin="12,4" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnItemTapped" CommandParameter="{Binding .}"/>
+                            </Grid.GestureRecognizers>
+                            <!-- Frame is purely visual — InputTransparent lets touches reach outer Grid -->
+                            <Frame Padding="14,16,84,16" CornerRadius="10" BorderColor="#E0EAF4" InputTransparent="True">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                    <Label Grid.Column="0" Text="{Binding StatusIcon}" FontSize="24"
+                                           VerticalOptions="Center"/>
+                                    <StackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding MedicineName}" FontAttributes="Bold" FontSize="15" TextColor="#0D1B2A"/>
+                                        <Label Text="{Binding StatusText}" FontSize="12" FontAttributes="Bold"
+                                               TextColor="{Binding StatusColor, Converter={StaticResource HexColorConverter}}"
+                                               IsVisible="{Binding CanActNow, Converter={StaticResource InverseBoolConverter}}"/>
+                                    </StackLayout>
+                                </Grid>
+                            </Frame>
+                            <!-- Right side -->
+                            <StackLayout HorizontalOptions="End" VerticalOptions="Center"
+                                         Spacing="2" Margin="0,0,14,0">
+                                <!-- Take Now: time + (in 45m) or (23m ago) on same line -->
+                                <StackLayout Orientation="Horizontal" Spacing="4" HorizontalOptions="End"
+                                             IsVisible="{Binding CanActNow}" InputTransparent="True">
+                                    <Label Text="{Binding ScheduleTimeDisplay}" FontSize="11" TextColor="#5A7A9A"/>
+                                    <Label Text="{Binding TimeUntilLabel}" FontSize="11"
+                                           TextColor="{Binding StatusColor, Converter={StaticResource HexColorConverter}}"/>
+                                </StackLayout>
+                                <!-- Upcoming: time only (no change) -->
+                                <Label Text="{Binding ScheduleTimeDisplay}" FontSize="11" TextColor="#5A7A9A"
+                                       HorizontalOptions="End" InputTransparent="True"
+                                       IsVisible="{Binding CanActNow, Converter={StaticResource InverseBoolConverter}}"/>
+                                <!-- Take button -->
+                                <Button IsVisible="{Binding CanActNow}" Text="Take" FontSize="12"
+                                        HeightRequest="34" WidthRequest="60"
+                                        BackgroundColor="#1A8A4A" TextColor="White" CornerRadius="8"
+                                        HorizontalOptions="End"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TakeDoseCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                <!-- Upcoming countdown (no change) -->
+                                <Label Text="{Binding TimeUntilText}" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{Binding StatusColor, Converter={StaticResource HexColorConverter}}"
+                                       HorizontalOptions="End" InputTransparent="True"
+                                       IsVisible="{Binding CanActNow, Converter={StaticResource InverseBoolConverter}}"/>
+                            </StackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Error + FAB -->
+        <Label Grid.Row="2" Text="{Binding ErrorMessage}" TextColor="Red"
+               IsVisible="{Binding HasError}" Padding="16,4"/>
+        <Button Grid.Row="1" Text="+" FontSize="24" WidthRequest="56" HeightRequest="56"
+                CornerRadius="28" BackgroundColor="#1B5FA8" TextColor="White"
+                HorizontalOptions="End" VerticalOptions="End" Margin="16"
+                Clicked="OnAddMedicineClicked"/>
+    </Grid>
+</ContentPage>

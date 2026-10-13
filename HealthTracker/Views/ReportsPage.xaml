@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.ReportsPage"
+             Title="Reports">
+    <Grid RowDefinitions="*,Auto">
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Reports}" EmptyView="No reports yet.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Delete" BackgroundColor="Red"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
+                                               CommandParameter="{Binding .}"/>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                            <Frame BorderColor="#E0EAF4" Margin="12,6" CornerRadius="8" Padding="12">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Label Grid.Column="0" Text="📄" FontSize="24" VerticalOptions="Center"/>
+                                    <StackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="15" TextColor="#0D1B2A"/>
+                                        <Label Text="{Binding ReportType}" TextColor="#5A7A9A" FontSize="12"/>
+                                        <Label Text="{Binding ReportDate}" TextColor="#5A7A9A" FontSize="12"/>
+                                        <Label Text="{Binding FileType}" TextColor="#1B5FA8" FontSize="11" FontAttributes="Bold"/>
+                                    </StackLayout>
+                                    <StackLayout Grid.Column="2" Orientation="Vertical" Spacing="4" VerticalOptions="Center">
+                                        <Button Text="View" FontSize="11" HeightRequest="32" WidthRequest="52"
+                                                CornerRadius="6" BackgroundColor="#1B5FA8" TextColor="White" Padding="4,0"
+                                                IsVisible="{Binding FileType, Converter={StaticResource IsPdfConverter}}"
+                                                Clicked="OnViewClicked" CommandParameter="{Binding .}"/>
+                                        <Button Text="Share" FontSize="11" HeightRequest="32" WidthRequest="52"
+                                                CornerRadius="6" BackgroundColor="#5A7A9A" TextColor="White" Padding="4,0"
+                                                Clicked="OnShareClicked" CommandParameter="{Binding .}"/>
+                                        <Button Text="Delete" FontSize="11" HeightRequest="32" WidthRequest="52"
+                                                CornerRadius="6" BackgroundColor="#922B21" TextColor="White" Padding="4,0"
+                                                Clicked="OnDeleteClicked" CommandParameter="{Binding .}"/>
+                                    </StackLayout>
+                                </Grid>
+                            </Frame>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Label Grid.Row="1" Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}" Padding="16,4"/>
+        <Button Grid.Row="0" Text="+" FontSize="24" WidthRequest="56" HeightRequest="56"
+                CornerRadius="28" BackgroundColor="#1B5FA8" TextColor="White"
+                HorizontalOptions="End" VerticalOptions="End" Margin="16"
+                Clicked="OnAddClicked"/>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:HealthTracker.Views"
+       x:Class="HealthTracker.AppShell"
+       Shell.BackgroundColor="#1B5FA8"
+       Shell.ForegroundColor="White"
+       Shell.TitleColor="White"
+       Shell.TabBarBackgroundColor="White"
+       Shell.TabBarForegroundColor="#1B5FA8"
+       Shell.TabBarTitleColor="#1B5FA8"
+       Shell.TabBarUnselectedColor="#5A7A9A">
+
+    <Shell.ToolbarItems>
+        <ToolbarItem Text="Ask AI" Order="Primary" Priority="0" Clicked="OnAskAiClicked"/>
+        <ToolbarItem Text="⚙" Order="Primary" Priority="1" Clicked="OnSettingsClicked"/>
+    </Shell.ToolbarItems>
+
+    <TabBar>
+        <Tab Title="Today">
+            <ShellContent Route="today"
+                          ContentTemplate="{DataTemplate views:TodayPage}"/>
+        </Tab>
+        <Tab Title="Metrics">
+            <ShellContent Route="metrics"
+                          ContentTemplate="{DataTemplate views:MetricsDashboardPage}"/>
+        </Tab>
+        <Tab Title="Reports">
+            <ShellContent Route="reports"
+                          ContentTemplate="{DataTemplate views:ReportsPage}"/>
+        </Tab>
+        <Tab Title="Doctors">
+            <ShellContent Route="doctors"
+                          ContentTemplate="{DataTemplate views:DoctorVisitsPage}"/>
+        </Tab>
+        <Tab Title="Timeline">
+            <ShellContent Route="timeline"
+                          ContentTemplate="{DataTemplate views:TimelinePage}"/>
+        </Tab>
+    </TabBar>
+</Shell>

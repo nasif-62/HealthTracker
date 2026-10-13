@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.TimelinePage"
+             Title="Timeline">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="History" Clicked="OnHistoryClicked"/>
+    </ContentPage.ToolbarItems>
+    <Grid RowDefinitions="*,Auto">
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Entries}" EmptyView="No events yet.">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="6,*" Padding="12,5" ColumnSpacing="0">
+                        <!-- Colored left accent bar -->
+                        <BoxView Grid.Column="0"
+                                 BackgroundColor="{Binding TagColor, Converter={StaticResource HexColorConverter}}"
+                                 CornerRadius="3" Margin="0,4,8,4"/>
+
+                        <Frame Grid.Column="1" Padding="12,10" Margin="0,3" CornerRadius="8"
+                               BorderColor="#E0EAF4">
+                            <StackLayout Spacing="4">
+                                <!-- Month group header -->
+                                <Label Text="{Binding MonthYearGroup}" FontSize="10" FontAttributes="Bold"
+                                       TextColor="#8BAAC8"
+                                       IsVisible="{Binding MonthYearGroup, Converter={StaticResource NotNullConverter}}"/>
+
+                                <!-- Icon + tag row -->
+                                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="6">
+                                    <Label Grid.Column="0" Text="{Binding TagIcon}" FontSize="18" VerticalOptions="Center"/>
+                                    <Frame Grid.Column="1" Padding="6,2" CornerRadius="10"
+                                           BackgroundColor="{Binding TagColor, Converter={StaticResource HexColorConverter}}"
+                                           BorderColor="Transparent" HasShadow="False">
+                                        <Label Text="{Binding DisplayLabel}" TextColor="White"
+                                               FontSize="11" FontAttributes="Bold"/>
+                                    </Frame>
+                                    <Label Grid.Column="3" TextColor="#8BAAC8" FontSize="11" VerticalOptions="Center" HorizontalOptions="End">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding EventDate}"/>
+                                                <Span Text="  "/>
+                                                <Span Text="{Binding TimeText}"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </Grid>
+
+                                <!-- Description -->
+                                <Label Text="{Binding Description}" TextColor="#2C4A6E"
+                                       FontSize="13" LineBreakMode="TailTruncation"/>
+                                <Label Text="{Binding SubText}" TextColor="#8BAAC8" FontSize="11"
+                                       IsVisible="{Binding SubText, Converter={StaticResource NotNullConverter}}"/>
+                            </StackLayout>
+                        </Frame>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.Footer>
+                <Button Text="Load More" Command="{Binding LoadMoreCommand}"
+                        BackgroundColor="Transparent" TextColor="#1B5FA8"
+                        IsVisible="{Binding HasMore}" Margin="16,4"/>
+            </CollectionView.Footer>
+        </CollectionView>
+    </Grid>
+</ContentPage>

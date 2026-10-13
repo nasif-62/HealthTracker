@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.DoctorVisitDetailPage"
+             Title="Visit Details">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Upload" Clicked="OnUploadClicked" Order="Primary" Priority="0"/>
+    </ContentPage.ToolbarItems>
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="12">
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}"/>
+
+            <Frame BorderColor="#C8D8EA" CornerRadius="8" Padding="14">
+                <StackLayout Spacing="8">
+                    <Label Text="{Binding Visit.DoctorName}" FontSize="20" FontAttributes="Bold" TextColor="#0D1B2A"/>
+                    <Label Text="{Binding Visit.Hospital}" TextColor="#5A7A9A"
+                           IsVisible="{Binding Visit.Hospital, Converter={StaticResource NotNullConverter}}"/>
+                    <Label Text="{Binding Visit.VisitDate, StringFormat='Date: {0}'}" TextColor="#5A7A9A"/>
+                    <Label Text="{Binding Visit.FollowUpDate, StringFormat='Follow-up: {0}'}" TextColor="#1B5FA8"
+                           IsVisible="{Binding Visit.FollowUpDate, Converter={StaticResource NotNullConverter}}"
+                           FontAttributes="Bold"/>
+                </StackLayout>
+            </Frame>
+
+            <Label Text="Diagnosis" FontAttributes="Bold" FontSize="15"/>
+            <Label Text="{Binding Visit.Diagnosis}" TextColor="#2C4A6E"
+                   IsVisible="{Binding Visit.Diagnosis, Converter={StaticResource NotNullConverter}}"/>
+            <Label Text="No diagnosis recorded." TextColor="#5A7A9A"
+                   IsVisible="{Binding Visit.Diagnosis, Converter={StaticResource NullConverter}}"/>
+
+            <Label Text="Notes" FontAttributes="Bold" FontSize="15" Margin="0,8,0,0"/>
+            <Label Text="{Binding Visit.Notes}" TextColor="#2C4A6E"
+                   IsVisible="{Binding Visit.Notes, Converter={StaticResource NotNullConverter}}"/>
+
+            <Frame BorderColor="#E67E22" CornerRadius="8" Padding="12" IsVisible="{Binding HasPrescriptionImage}">
+                <StackLayout Spacing="6">
+                    <Label Text="Prescription Image" FontAttributes="Bold" FontSize="14" TextColor="#E67E22"/>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="Scanned prescription attached" TextColor="#5A7A9A" FontSize="12" VerticalOptions="Center"/>
+                        <Button Grid.Column="1" Text="View" FontSize="11" HeightRequest="32" WidthRequest="52"
+                                CornerRadius="6" BackgroundColor="#E67E22" TextColor="White" Padding="4,0"
+                                Clicked="OnViewPrescriptionClicked"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <Label Text="Attached Reports" FontAttributes="Bold" FontSize="15" Margin="0,8,0,0"/>
+            <CollectionView ItemsSource="{Binding Reports}" EmptyView="No reports attached.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="#E0EAF4" Margin="0,4" CornerRadius="6" Padding="10">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                <Label Grid.Column="0" Text="📄" FontSize="20" VerticalOptions="Center"/>
+                                <StackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding Title}" FontAttributes="Bold" TextColor="#0D1B2A"/>
+                                    <Label Text="{Binding ReportType}" TextColor="#5A7A9A" FontSize="12"/>
+                                    <Label Text="{Binding FileType}" TextColor="#1B5FA8" FontSize="11" FontAttributes="Bold"/>
+                                </StackLayout>
+                                <StackLayout Grid.Column="2" Orientation="Vertical" Spacing="4" VerticalOptions="Center">
+                                    <Button Text="View" FontSize="11" HeightRequest="32" WidthRequest="52"
+                                            CornerRadius="6" BackgroundColor="#1B5FA8" TextColor="White" Padding="4,0"
+                                            IsVisible="{Binding FileType, Converter={StaticResource IsPdfConverter}}"
+                                            Clicked="OnViewReportClicked" CommandParameter="{Binding .}"/>
+                                    <Button Text="Share" FontSize="11" HeightRequest="32" WidthRequest="52"
+                                            CornerRadius="6" BackgroundColor="#5A7A9A" TextColor="White" Padding="4,0"
+                                            Clicked="OnShareReportClicked" CommandParameter="{Binding .}"/>
+                                </StackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

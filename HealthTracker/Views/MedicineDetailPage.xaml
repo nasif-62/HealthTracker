@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.MedicineDetailPage"
+             Title="{Binding Medicine.Name}">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Edit" Clicked="OnEditClicked" Order="Primary" Priority="0"/>
+    </ContentPage.ToolbarItems>
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="12">
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}"/>
+
+            <Frame BorderColor="#C8D8EA" CornerRadius="8" Padding="14">
+                <StackLayout Spacing="6">
+                    <Label Text="{Binding Medicine.Name}" FontSize="20" FontAttributes="Bold" TextColor="#0D1B2A"/>
+                    <Label Text="{Binding Medicine.StockCount, StringFormat='Stock: {0}'}" TextColor="#5A7A9A"/>
+                    <Label Text="{Binding Medicine.Instructions}" TextColor="#5A7A9A"
+                           IsVisible="{Binding Medicine.Instructions, Converter={StaticResource NotNullConverter}}"/>
+                    <!-- Inactive badge -->
+                    <Label Text="Course Completed — Inactive" FontSize="12" FontAttributes="Bold"
+                           TextColor="#E67E22" IsVisible="{Binding IsInactive}"/>
+                    <Button Text="Start New Course" Command="{Binding NewCourseCommand}"
+                            BackgroundColor="#1B5FA8" TextColor="White" CornerRadius="8"
+                            HeightRequest="38" IsVisible="{Binding IsInactive}"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Today's Schedule (active only) -->
+            <Label Text="Today's Schedule" FontAttributes="Bold" FontSize="16"
+                   IsVisible="{Binding IsInactive, Converter={StaticResource InverseBoolConverter}}"/>
+            <CollectionView ItemsSource="{Binding Schedules}"
+                            IsVisible="{Binding IsInactive, Converter={StaticResource InverseBoolConverter}}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="#C8D8EA" Padding="12" Margin="0,4" CornerRadius="6">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Label Grid.Column="0" Text="{Binding ScheduleTimeDisplay}" FontSize="16"
+                                       FontAttributes="Bold" VerticalOptions="Center"/>
+                                <Label Grid.Column="1" Text="{Binding StatusText}" FontSize="13"
+                                       TextColor="{Binding StatusColor, Converter={StaticResource HexColorConverter}}"
+                                       FontAttributes="Bold" VerticalOptions="Center"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Log Past Doses (active medicines with past start date) -->
+            <Button Text="Log Past Doses" Command="{Binding BackfillPastDosesCommand}"
+                    BackgroundColor="Transparent" TextColor="#1B5FA8" BorderColor="#1B5FA8" BorderWidth="1"
+                    CornerRadius="8" HeightRequest="38"
+                    IsVisible="{Binding IsInactive, Converter={StaticResource InverseBoolConverter}}"/>
+
+            <!-- Course History -->
+            <Label Text="Course History" FontAttributes="Bold" FontSize="16" Margin="0,8,0,0"/>
+            <CollectionView ItemsSource="{Binding Courses}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="#C8D8EA" Padding="12" Margin="0,4" CornerRadius="6">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                <Label Grid.Column="0" Text="{Binding StatusIcon}" FontSize="18" VerticalOptions="Center"/>
+                                <StackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding DateRangeText}" FontAttributes="Bold" FontSize="14" TextColor="#0D1B2A"/>
+                                    <Label Text="{Binding SummaryText}" FontSize="12" TextColor="#5A7A9A"/>
+                                </StackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Recent Logs -->
+            <Label Text="Recent Logs (7 days)" FontAttributes="Bold" FontSize="16" Margin="0,8,0,0"/>
+            <CollectionView ItemsSource="{Binding RecentLogs}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="0,6" ColumnSpacing="10">
+                            <Label Grid.Column="0" Text="{Binding WasTaken, Converter={StaticResource TakenIconConverter}}" FontSize="18"/>
+                            <Label Grid.Column="1" Text="{Binding ScheduledForDisplay}" TextColor="#5A7A9A" FontSize="13" VerticalOptions="Center"/>
+                            <Label Grid.Column="2" Text="{Binding StockAfter, StringFormat='→{0}'}" TextColor="#5A7A9A" FontSize="12" VerticalOptions="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

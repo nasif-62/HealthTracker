@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.ScanPrescriptionPage"
+             Title="Scan Prescription">
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="14">
+
+            <Label Text="Take a photo or pick an image of your prescription to extract medicine names."
+                   TextColor="#5A7A9A" FontSize="13"/>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button Grid.Column="0" Text="Take Photo" Command="{Binding CaptureImageCommand}"
+                        BackgroundColor="#1B5FA8" TextColor="White" CornerRadius="8"/>
+                <Button Grid.Column="1" Text="Pick Image" Command="{Binding PickImageCommand}"
+                        BackgroundColor="Transparent" TextColor="#1B5FA8" BorderColor="#1B5FA8" BorderWidth="1" CornerRadius="8"/>
+            </Grid>
+
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}" FontSize="13"/>
+
+            <!-- Extracted Text -->
+            <Frame BorderColor="#C8D8EA" CornerRadius="8" Padding="12" IsVisible="{Binding HasScanned}">
+                <StackLayout Spacing="6">
+                    <Label Text="Extracted Text" FontAttributes="Bold" FontSize="14" TextColor="#0D1B2A"/>
+                    <Label Text="{Binding OcrText}" TextColor="#5A7A9A" FontSize="12" MaxLines="10" LineBreakMode="WordWrap"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Detected Medicines -->
+            <Label Text="Detected Medicines" FontAttributes="Bold" FontSize="16" TextColor="#0D1B2A"
+                   IsVisible="{Binding HasResults}" Margin="0,4,0,0"/>
+            <Label Text="Uncheck any you don't want to save."
+                   TextColor="#5A7A9A" FontSize="12" IsVisible="{Binding HasResults}"/>
+
+            <CollectionView ItemsSource="{Binding ScannedMedicines}" IsVisible="{Binding HasResults}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="#C8D8EA" Padding="12" Margin="0,4" CornerRadius="8">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" VerticalOptions="Center"
+                                          Color="#1B5FA8"/>
+                                <Label Grid.Column="1" Text="{Binding DisplayText}" FontSize="14"
+                                       TextColor="#0D1B2A" VerticalOptions="Center" LineBreakMode="WordWrap"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="Save to Pending Review" Command="{Binding SaveToPendingCommand}"
+                    BackgroundColor="#E67E22" TextColor="White" CornerRadius="8"
+                    IsVisible="{Binding HasResults}" Margin="0,8,0,0"/>
+
+            <!-- Success result -->
+            <Frame BorderColor="#1A8A4A" CornerRadius="8" Padding="14" IsVisible="{Binding SavedSuccessfully}"
+                   BackgroundColor="#E8F5E9">
+                <StackLayout Spacing="6">
+                    <Label Text="Saved to Pending" FontAttributes="Bold" FontSize="16" TextColor="#1A8A4A"/>
+                    <Label Text="{Binding ResultMessage}" TextColor="#2E7D32" FontSize="13"/>
+                    <Label Text="Go to Medicines to review and approve each one."
+                           TextColor="#5A7A9A" FontSize="12" Margin="0,4,0,0"/>
+                </StackLayout>
+            </Frame>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

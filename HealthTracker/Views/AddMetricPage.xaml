@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.AddMetricPage"
+             Title="Record Metric">
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="12">
+            <Label Text="Metric Type" FontAttributes="Bold"/>
+            <Picker ItemsSource="{Binding MetricTypeOptions}" SelectedItem="{Binding SelectedType}"/>
+
+            <Label Text="Value" FontAttributes="Bold"/>
+            <Grid ColumnDefinitions="*,80">
+                <Entry Grid.Column="0" Text="{Binding ValueText}" Keyboard="Numeric" Placeholder="Enter value"/>
+                <Label Grid.Column="1" Text="{Binding Unit}" VerticalOptions="Center" HorizontalOptions="Center" TextColor="#5A7A9A"/>
+            </Grid>
+
+            <StackLayout IsVisible="{Binding IsBloodPressure}" Spacing="8">
+                <Label Text="Diastolic (mmHg)" FontAttributes="Bold"/>
+                <Entry Text="{Binding SecondValueText}" Keyboard="Numeric" Placeholder="Diastolic value"/>
+            </StackLayout>
+
+            <Label Text="Recorded At" FontAttributes="Bold"/>
+            <DatePicker Date="{Binding RecordedAt}"/>
+
+            <Label Text="Notes (optional)" FontAttributes="Bold"/>
+            <Entry Text="{Binding Notes}"/>
+
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}" FontSize="13"/>
+
+            <Button Text="Save" Command="{Binding SaveCommand}" BackgroundColor="#1B5FA8" TextColor="White"/>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

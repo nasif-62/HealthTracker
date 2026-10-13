@@ -1,0 +1,16 @@
+# Build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.binlog
+
+# Local tooling / scratch
+.claude/
+.pdf_profile/
+*.pyc
+
+# OS
+Thumbs.db
+.DS_Store

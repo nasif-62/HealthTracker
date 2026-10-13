@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.DoctorVisitsPage"
+             Title="Doctor Visits">
+    <Grid RowDefinitions="*,Auto">
+        <CollectionView Grid.Row="0" ItemsSource="{Binding Visits}" EmptyView="No visits recorded yet.">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Delete" BackgroundColor="Red"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
+                                           CommandParameter="{Binding .}"/>
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+                        <Frame BorderColor="#C8D8EA" Margin="12,5" CornerRadius="10" Padding="14">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <StackLayout Grid.Column="0" Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0" Text="{Binding DoctorName}"
+                                               FontAttributes="Bold" FontSize="16" TextColor="#0D1B2A"/>
+                                        <Label Grid.Column="1" Text="{Binding VisitDate}"
+                                               TextColor="#5A7A9A" FontSize="12" VerticalOptions="Center"/>
+                                    </Grid>
+                                    <Label Text="{Binding Hospital}" TextColor="#5A7A9A" FontSize="13"
+                                           IsVisible="{Binding Hospital, Converter={StaticResource NotNullConverter}}"/>
+                                    <Label Text="{Binding Diagnosis}" TextColor="#2C4A6E" FontSize="12"
+                                           LineBreakMode="TailTruncation" MaxLines="1"
+                                           IsVisible="{Binding Diagnosis, Converter={StaticResource NotNullConverter}}"/>
+                                    <Label Text="Follow-up scheduled" TextColor="#1B5FA8" FontSize="11"
+                                           FontAttributes="Bold"
+                                           IsVisible="{Binding FollowUpDate, Converter={StaticResource NotNullConverter}}"/>
+                                </StackLayout>
+                                <StackLayout Grid.Column="1" Orientation="Vertical" Spacing="2" VerticalOptions="Center">
+                                    <Button Text="View" FontSize="12" HeightRequest="32" WidthRequest="50"
+                                            BackgroundColor="Transparent" TextColor="#1B5FA8"
+                                            FontAttributes="Bold" Padding="0"
+                                            Clicked="OnViewClicked" CommandParameter="{Binding .}"/>
+                                    <Button Text="Edit" FontSize="12" HeightRequest="32" WidthRequest="50"
+                                            BackgroundColor="Transparent" TextColor="#5A7A9A"
+                                            Padding="0"
+                                            Clicked="OnEditClicked" CommandParameter="{Binding .}"/>
+                                </StackLayout>
+                            </Grid>
+                        </Frame>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Label Grid.Row="1" Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}" Padding="16,4"/>
+        <Button Grid.Row="0" Text="+" FontSize="24" WidthRequest="56" HeightRequest="56"
+                CornerRadius="28" BackgroundColor="#1B5FA8" TextColor="White"
+                HorizontalOptions="End" VerticalOptions="End" Margin="16"
+                Clicked="OnAddClicked"/>
+    </Grid>
+</ContentPage>

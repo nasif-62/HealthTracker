@@ -1,0 +1,21 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:helpers="clr-namespace:HealthTracker.Helpers"
+             x:Class="HealthTracker.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <helpers:NotNullConverter x:Key="NotNullConverter"/>
+            <helpers:NullConverter x:Key="NullConverter"/>
+            <helpers:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <helpers:TakenIconConverter x:Key="TakenIconConverter"/>
+            <helpers:PinStatusConverter x:Key="PinStatusConverter"/>
+            <helpers:IsPdfConverter x:Key="IsPdfConverter"/>
+            <helpers:HexColorConverter x:Key="HexColorConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

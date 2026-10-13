@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.SettingsPage"
+             Title="Settings">
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="16">
+
+            <Label Text="PIN Lock" FontAttributes="Bold" FontSize="17" TextColor="#0D1B2A"/>
+            <Frame BorderColor="#C8D8EA" CornerRadius="8" Padding="14">
+                <StackLayout Spacing="10">
+                    <Label Text="{Binding PinConfigured, Converter={StaticResource PinStatusConverter}}"
+                           TextColor="#5A7A9A" FontSize="13"/>
+                    <Label Text="New PIN (4–6 digits)" FontAttributes="Bold"/>
+                    <Entry Text="{Binding NewPin}" IsPassword="True" Keyboard="Numeric" Placeholder="Enter new PIN"/>
+                    <Label Text="Confirm PIN" FontAttributes="Bold"/>
+                    <Entry Text="{Binding ConfirmPin}" IsPassword="True" Keyboard="Numeric" Placeholder="Confirm PIN"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="Save PIN" Command="{Binding SavePinCommand}"
+                                BackgroundColor="#1B5FA8" TextColor="White"/>
+                        <Button Grid.Column="1" Text="Remove PIN" Command="{Binding RemovePinCommand}"
+                                BackgroundColor="#922B21" TextColor="White"
+                                IsVisible="{Binding PinConfigured}"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <Label Text="Health Report" FontAttributes="Bold" FontSize="17" TextColor="#0D1B2A"/>
+            <Frame BorderColor="#C8D8EA" CornerRadius="8" Padding="14">
+                <StackLayout Spacing="10">
+                    <Label Text="Generate a detailed PDF report of your complete health history including medicines, doses, doctor visits, and metrics."
+                           TextColor="#5A7A9A" FontSize="13"/>
+                    <ActivityIndicator IsRunning="{Binding IsGeneratingReport}"
+                                       IsVisible="{Binding IsGeneratingReport}"
+                                       Color="#1B5FA8"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8"
+                          IsVisible="{Binding IsGeneratingReport, Converter={StaticResource InverseBoolConverter}}">
+                        <Button Grid.Column="0" Text="Without Reports"
+                                Command="{Binding GenerateReportCommand}"
+                                BackgroundColor="#1B5FA8" TextColor="White" FontSize="13"/>
+                        <Button Grid.Column="1" Text="With Reports"
+                                Command="{Binding GenerateReportWithFilesCommand}"
+                                BackgroundColor="#145A32" TextColor="White" FontSize="13"/>
+                    </Grid>
+                    <Label Text="'With Reports' embeds your scanned report files — may produce a large PDF."
+                           TextColor="#5A7A9A" FontSize="11"/>
+                </StackLayout>
+            </Frame>
+
+            <Label Text="Backup &amp; Export" FontAttributes="Bold" FontSize="17" TextColor="#0D1B2A"/>
+            <Frame BorderColor="#C8D8EA" CornerRadius="8" Padding="14">
+                <StackLayout Spacing="10">
+                    <Label Text="Creates a ZIP with your database and all stored files, then shares it via your device share menu."
+                           TextColor="#5A7A9A" FontSize="13"/>
+                    <Button Text="Create Backup" Command="{Binding BackupCommand}"
+                            BackgroundColor="#145A32" TextColor="White"/>
+                </StackLayout>
+            </Frame>
+
+            <Label Text="AI Smart Scan" FontAttributes="Bold" FontSize="17" TextColor="#E67E22"/>
+            <Frame BorderColor="#E67E22" CornerRadius="8" Padding="14">
+                <StackLayout Spacing="10">
+                    <Label Text="Add a free Gemini API key to enable AI-powered scanning. AI extracts fields from report images and prescription photos when adding doctor visits."
+                           TextColor="#5A7A9A" FontSize="13"/>
+                    <Label FontSize="12">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Get a free key at " TextColor="#5A7A9A"/>
+                                <Span Text="aistudio.google.com" TextColor="#1B5FA8" TextDecorations="Underline">
+                                    <Span.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnAiStudioLinkTapped"/>
+                                    </Span.GestureRecognizers>
+                                </Span>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Text="{Binding AiStatusMessage}" TextColor="#145A32" FontSize="13" FontAttributes="Bold"
+                           IsVisible="{Binding AiConfigured}"/>
+                    <Entry Text="{Binding GeminiApiKey}" Placeholder="Paste Gemini API key here"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="Save Key" Command="{Binding SaveApiKeyCommand}"
+                                BackgroundColor="#E67E22" TextColor="White"
+                                IsVisible="{Binding AiNotConfigured}"/>
+                        <Button Grid.Column="1" Text="Remove Key" Command="{Binding RemoveApiKeyCommand}"
+                                BackgroundColor="#922B21" TextColor="White"
+                                IsVisible="{Binding AiConfigured}"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}"/>
+            <Label Text="Danger Zone" FontAttributes="Bold" FontSize="17" TextColor="#922B21"/>
+            <Frame BorderColor="#922B21" CornerRadius="8" Padding="14">
+                <StackLayout Spacing="10">
+                    <Label Text="Permanently delete all medicines, metrics, reports, doctor visits, and logs. This cannot be undone."
+                           TextColor="#5A7A9A" FontSize="13"/>
+                    <Button Text="Delete All Data" Command="{Binding DeleteAllDataCommand}"
+                            BackgroundColor="#922B21" TextColor="White"/>
+                </StackLayout>
+            </Frame>
+
+            <Label Text="About" FontAttributes="Bold" FontSize="17" TextColor="#0D1B2A"/>
+            <Frame BorderColor="#C8D8EA" CornerRadius="8" Padding="14">
+                <StackLayout Spacing="4">
+                    <Label Text="HealthTracker v1.0" FontAttributes="Bold" TextColor="#0D1B2A"/>
+                    <Label Text="Personal Health Tracker &amp; Medicine Manager" TextColor="#5A7A9A" FontSize="13"/>
+                    <Label Text="Offline-first · Single user · No cloud" TextColor="#5A7A9A" FontSize="12"/>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

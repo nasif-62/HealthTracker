@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.PinLockPage"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#0D1B2A">
+    <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="24" Padding="32">
+        <Label Text="💊" FontSize="48" HorizontalOptions="Center"/>
+        <Label Text="HealthTracker" FontSize="24" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+        <Label Text="Enter your PIN to continue" TextColor="#5A7A9A" HorizontalOptions="Center"/>
+
+        <Entry Text="{Binding EnteredPin}" IsPassword="True" Keyboard="Numeric"
+               MaxLength="6" TextColor="White" BackgroundColor="#1a3a5c"
+               PlaceholderColor="#5A7A9A" Placeholder="••••"
+               HorizontalTextAlignment="Center" FontSize="24"
+               WidthRequest="160"/>
+
+        <Button Text="Unlock" Command="{Binding SubmitCommand}"
+                BackgroundColor="#1B5FA8" TextColor="White"
+                WidthRequest="160" IsEnabled="{Binding IsCoolingDown, Converter={StaticResource InverseBoolConverter}}"/>
+
+        <Label Text="{Binding ErrorMessage}" TextColor="#FF9D9D" IsVisible="{Binding HasError}"
+               HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+
+        <Label IsVisible="{Binding IsCoolingDown}" TextColor="#FFB347" HorizontalOptions="Center">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="Wait " TextColor="#FFB347"/>
+                    <Span Text="{Binding CooldownSecondsRemaining}" TextColor="#FFB347" FontAttributes="Bold"/>
+                    <Span Text=" seconds" TextColor="#FFB347"/>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+    </StackLayout>
+</ContentPage>

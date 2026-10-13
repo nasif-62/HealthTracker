@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:microcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             x:Class="HealthTracker.Views.MetricHistoryPage"
+             Title="{Binding MetricType}">
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="14">
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}"/>
+
+            <!-- Chart card -->
+            <Frame BorderColor="#E8EFF7" CornerRadius="14" Padding="14"
+                   BackgroundColor="White" HasShadow="True" IsVisible="{Binding HasChart}">
+                <StackLayout Spacing="8">
+                    <Label Text="Last 30 readings" FontSize="12" TextColor="#8C9EAD" FontAttributes="Bold"/>
+                    <microcharts:ChartView Chart="{Binding MetricChart}" HeightRequest="220"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Stats row -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" IsVisible="{Binding HasChart}">
+                <Frame Grid.Column="0" BorderColor="#E8EFF7" CornerRadius="10" Padding="10"
+                       BackgroundColor="White" HasShadow="False">
+                    <StackLayout Spacing="2">
+                        <Label Text="LATEST" FontSize="10" TextColor="#8C9EAD" FontAttributes="Bold"/>
+                        <Label Text="{Binding LatestText}" FontSize="13" FontAttributes="Bold" TextColor="#0D1B2A"
+                               LineBreakMode="TailTruncation"/>
+                    </StackLayout>
+                </Frame>
+                <Frame Grid.Column="1" BorderColor="#E8EFF7" CornerRadius="10" Padding="10"
+                       BackgroundColor="White" HasShadow="False">
+                    <StackLayout Spacing="2">
+                        <Label Text="MIN" FontSize="10" TextColor="#8C9EAD" FontAttributes="Bold"/>
+                        <Label Text="{Binding MinText}" FontSize="13" FontAttributes="Bold" TextColor="#27AE60"
+                               LineBreakMode="TailTruncation"/>
+                    </StackLayout>
+                </Frame>
+                <Frame Grid.Column="2" BorderColor="#E8EFF7" CornerRadius="10" Padding="10"
+                       BackgroundColor="White" HasShadow="False">
+                    <StackLayout Spacing="2">
+                        <Label Text="MAX" FontSize="10" TextColor="#8C9EAD" FontAttributes="Bold"/>
+                        <Label Text="{Binding MaxText}" FontSize="13" FontAttributes="Bold" TextColor="#E74C3C"
+                               LineBreakMode="TailTruncation"/>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Records -->
+            <Label Text="Records" FontAttributes="Bold" FontSize="16" TextColor="#0D1B2A" Margin="0,4,0,0"/>
+            <CollectionView ItemsSource="{Binding History}" EmptyView="No records yet.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <SwipeView>
+                            <SwipeView.RightItems>
+                                <SwipeItems>
+                                    <SwipeItem Text="Delete" BackgroundColor="#E74C3C"
+                                               Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeleteCommand}"
+                                               CommandParameter="{Binding .}"/>
+                                </SwipeItems>
+                            </SwipeView.RightItems>
+                            <Grid Margin="0,3" BackgroundColor="Transparent">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnRecordTapped" CommandParameter="{Binding .}"/>
+                                </Grid.GestureRecognizers>
+                                <Frame BorderColor="#F0F4F8" CornerRadius="10" Padding="12"
+                                       BackgroundColor="White" InputTransparent="True">
+                                    <Grid ColumnDefinitions="4,*,Auto" ColumnSpacing="12">
+                                        <BoxView Grid.Column="0" WidthRequest="4" HeightRequest="36"
+                                                 CornerRadius="2" Color="#1B5FA8" VerticalOptions="Center"/>
+                                        <StackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                            <Label Text="{Binding Value, StringFormat='{0:0.#}'}"
+                                                   FontSize="17" FontAttributes="Bold" TextColor="#0D1B2A"/>
+                                            <Label Text="{Binding RecordedAtDisplay}" FontSize="11" TextColor="#8C9EAD"/>
+                                        </StackLayout>
+                                        <Label Grid.Column="2" Text="{Binding Unit}"
+                                               FontSize="13" TextColor="#5A7A9A" VerticalOptions="Center"/>
+                                    </Grid>
+                                </Frame>
+                            </Grid>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

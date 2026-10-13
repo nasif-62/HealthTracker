@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Health Tracker Developer Handbook</title>
+<style>
+/* ── PRINT ENGINE ── */
+@page {
+  size: A4;
+  margin: 0;
+}
+@page :first { margin: 0; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent: #1B5FA8;
+  --accent2: #2980D9;
+  --dark: #0D1B2A;
+  --mid: #2C4A6E;
+  --muted: #5A7A9A;
+  --border: #C8D8EA;
+  --bg: #F4F8FC;
+  --white: #FFFFFF;
+  --green: #145A32;
+  --green-bg: #EAF7EE;
+  --green-border: #A9DFBF;
+  --red: #922B21;
+  --red-bg: #FDEDEC;
+  --red-border: #F1948A;
+  --amber: #7D5A00;
+  --amber-bg: #FEF9E7;
+  --amber-border: #F9E79F;
+  --code-bg: #0D1B2A;
+}
+
+body {
+  font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+  background: #B0C4D8;
+  color: var(--dark);
+  font-size: 11pt;
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ── PAGES ── */
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  background: var(--white);
+  margin: 12mm auto;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+@media print {
+  body { background: white; }
+  .export-btn { display: none !important; }
+  .page {
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+    break-after: page;
+    width: 100%;
+    min-height: 297mm;
+  }
+}
+
+/* ── COVER ── */
+.cover {
+  background: linear-gradient(150deg, #0D1B2A 0%, #1a3a5c 50%, #1B5FA8 100%);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  padding: 0;
+}
+.cover-band {
+  height: 5px;
+  background: linear-gradient(90deg, #5BB8FF, #1B5FA8, transparent);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cover-topbar {
+  padding: 28px 36px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cover-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11pt; font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.04em;
+}
+.brand-icon {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.cover-ver {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.75);
+  font-size: 9pt;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cover-body {
+  flex: 1;
+  padding: 56px 36px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.cover-eyebrow {
+  font-size: 8.5pt;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #72C3FF;
+  margin-bottom: 16px;
+}
+.cover-title {
+  font-size: 32pt;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: white;
+  margin-bottom: 10px;
+}
+.cover-sub {
+  font-size: 12pt;
+  color: rgba(255,255,255,0.5);
+  font-weight: 300;
+  margin-bottom: 40px;
+}
+.cover-rule {
+  width: 52px; height: 3px;
+  background: linear-gradient(90deg, #72C3FF, transparent);
+  border-radius: 2px;
+  margin-bottom: 36px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cover-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  max-width: 380px;
+}
+.meta-item label {
+  display: block;
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 3px;
+}
+.meta-item span {
+  font-size: 10.5pt;
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+}
+.cover-footer {
+  padding: 20px 36px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cover-footer-left {
+  font-size: 8.5pt;
+  color: rgba(255,255,255,0.3);
+}
+.cover-footer-tags {
+  display: flex; gap: 20px;
+  font-size: 8.5pt;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ── INNER PAGE CHROME ── */
+.pg-stripe {
+  height: 5px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 50%, transparent 100%);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  flex-shrink: 0;
+}
+.pg-body {
+  flex: 1;
+  padding: 32px 36px 52px;
+  overflow: hidden;
+}
+.pg-foot {
+  height: 38px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  font-size: 8pt;
+  color: var(--muted);
+  flex-shrink: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.foot-brand { color: var(--accent); font-weight: 700; }
+
+/* ── TYPOGRAPHY ── */
+.sec-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  color: var(--accent);
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 10px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+h1.pg { font-size: 19pt; font-weight: 800; color: var(--dark); letter-spacing: -0.02em; margin-bottom: 6px; line-height: 1.2; }
+.pg-desc { color: var(--muted); font-size: 9.5pt; margin-bottom: 20px; max-width: 480px; line-height: 1.6; }
+h2.sh {
+  font-size: 11.5pt; font-weight: 700; color: var(--dark);
+  margin: 22px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--bg);
+  display: flex; align-items: center; gap: 8px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+h2.sh::before {
+  content: '';
+  display: block;
+  width: 7px; height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  flex-shrink: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+h3.ssh { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 14px 0 6px; }
+
+/* ── TABLES ── */
+table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+thead tr { background: var(--dark); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+thead th { padding: 8px 11px; text-align: left; font-size: 7.5pt; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: white; }
+tbody tr:nth-child(even) { background: var(--bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+tbody td { padding: 7px 11px; border-bottom: 1px solid var(--border); color: var(--mid); line-height: 1.45; }
+tbody td:first-child { color: var(--dark); font-weight: 600; }
+.mono { font-family: 'Courier New', Courier, monospace; font-size: 8.5pt; }
+
+/* ── CODE BLOCKS ── */
+.code { background: var(--code-bg); border-radius: 7px; margin: 10px 0; overflow: hidden; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.code-hd {
+  background: rgba(255,255,255,0.05);
+  padding: 6px 14px;
+  display: flex; align-items: center; gap: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.dot.r { background: #FF5F57; } .dot.y { background: #FEBC2E; } .dot.g { background: #28C840; }
+.code-lang { color: rgba(255,255,255,0.25); font-size: 7.5pt; font-family: 'Courier New', monospace; margin-left: auto; letter-spacing: 0.1em; text-transform: uppercase; }
+.code-bd { padding: 13px 16px; font-family: 'Courier New', Courier, monospace; font-size: 8pt; line-height: 1.75; color: #8FB8D8; white-space: pre; overflow-x: hidden; }
+.kw { color: #79B8FF; } .str { color: #9EE09E; } .cm { color: #4A6A7A; font-style: italic; }
+.num { color: #FFB347; } .hl { color: #FFD580; font-weight: bold; } .arr { color: #FF9D9D; }
+
+/* ── CALLOUTS ── */
+.callout { border-radius: 6px; padding: 12px 16px; margin: 12px 0; display: flex; gap: 12px; border: 1px solid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.callout-ico { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.callout-bd { flex: 1; }
+.callout-ttl { font-size: 9pt; font-weight: 700; margin-bottom: 2px; }
+.callout-txt { font-size: 8.5pt; line-height: 1.55; }
+.callout.info { background: #EEF6FF; border-color: #BCD8F0; }
+.callout.info .callout-ttl { color: var(--accent); }
+.callout.info .callout-txt { color: var(--mid); }
+.callout.warn { background: var(--red-bg); border-color: var(--red-border); }
+.callout.warn .callout-ttl { color: var(--red); }
+.callout.warn .callout-txt { color: #7B241C; }
+.callout.rule { background: var(--amber-bg); border-color: var(--amber-border); }
+.callout.rule .callout-ttl { color: var(--amber); }
+.callout.rule .callout-txt { color: #6E4A00; }
+
+/* ── RULE CARDS ── */
+.rule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 12px 0; }
+.rc { background: var(--bg); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 6px; padding: 11px 13px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rc.am { border-left-color: #C9A000; }
+.rc.rd { border-left-color: var(--red); }
+.rc-id { font-size: 7.5pt; font-weight: 800; letter-spacing: 0.1em; font-family: 'Courier New', monospace; color: var(--accent); margin-bottom: 3px; }
+.rc.am .rc-id { color: #C9A000; } .rc.rd .rc-id { color: var(--red); }
+.rc-txt { font-size: 8.5pt; color: var(--mid); line-height: 1.5; }
+
+/* ── MODULE CARDS ── */
+.mod-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 12px 0; }
+.mc { background: var(--white); border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: 7px; padding: 14px 15px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.mc-ico { font-size: 18px; margin-bottom: 6px; }
+.mc-name { font-size: 9.5pt; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+.mc-desc { font-size: 8pt; color: var(--muted); line-height: 1.5; }
+
+/* ── FLOW STEPS ── */
+.flow { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 14px 18px; margin: 10px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.fstep { display: flex; gap: 12px; margin-bottom: 8px; align-items: flex-start; }
+.fstep:last-child { margin-bottom: 0; }
+.fnum { width: 22px; height: 22px; background: var(--accent); color: white; font-size: 8.5pt; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.ftitle { font-size: 9.5pt; font-weight: 700; color: var(--dark); }
+.fdetail { font-size: 8.5pt; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+
+/* ── TOC ── */
+.toc-item { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px dashed var(--border); }
+.toc-item:last-child { border-bottom: none; }
+.toc-left { display: flex; align-items: center; gap: 10px; }
+.toc-num { width: 24px; height: 24px; background: var(--bg); border: 1px solid var(--border); color: var(--accent); font-size: 8.5pt; font-weight: 800; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.toc-lbl { font-size: 10pt; font-weight: 600; color: var(--dark); }
+.toc-sub { font-size: 8.5pt; color: var(--muted); margin-top: 1px; }
+.toc-pg { font-size: 9pt; color: var(--muted); font-weight: 600; }
+
+/* ── SCOPE ── */
+.scope-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+.scope-box { border-radius: 7px; padding: 16px; border: 1px solid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.scope-box.inc { background: var(--green-bg); border-color: var(--green-border); }
+.scope-box.exc { background: var(--red-bg); border-color: var(--red-border); }
+.scope-ttl { font-size: 9pt; font-weight: 800; margin-bottom: 10px; }
+.scope-box.inc .scope-ttl { color: var(--green); }
+.scope-box.exc .scope-ttl { color: var(--red); }
+.scope-row { font-size: 8.5pt; color: var(--mid); padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; gap: 7px; }
+.scope-row:last-child { border-bottom: none; }
+
+/* ── DATA TABLE PILL ── */
+.pill { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 8pt; font-weight: 700; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.pill.g { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.pill.r { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.pill.a { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+
+/* ── EXPORT BUTTON ── */
+.export-btn {
+  position: fixed; top: 20px; right: 20px; z-index: 999;
+  background: var(--accent); color: white;
+  border: none; padding: 10px 20px; border-radius: 8px;
+  font-size: 11pt; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 18px rgba(27,95,168,0.4);
+  font-family: inherit;
+  display: flex; align-items: center; gap: 8px;
+}
+.export-btn:hover { background: #154E8A; }
+</style>
+</head>
+<body>
+
+<button class="export-btn" onclick="
+  const html = document.documentElement.outerHTML;
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'HealthTracker_Developer_Handbook.html';
+  a.click();
+">⬇️ Download HTML</button>
+
+<!-- ██████████████████████ COVER ██████████████████████ -->
+<div class="page">
+<div class="cover">
+  <div class="cover-band"></div>
+  <div class="cover-topbar">
+    <div class="cover-brand"><div class="brand-icon">💊</div> HealthTracker App</div>
+    <div class="cover-ver">v1.0 — MVP</div>
+  </div>
+  <div class="cover-body">
+    <div class="cover-eyebrow">Developer Handbook</div>
+    <div class="cover-title">Personal Health Tracker<br>&amp; Medicine Manager</div>
+    <div class="cover-sub">Complete implementation reference for Claude Code</div>
+    <div class="cover-rule"></div>
+    <div class="cover-meta">
+      <div class="meta-item"><label>Document Type</label><span>Developer Handbook</span></div>
+      <div class="meta-item"><label>Version</label><span>1.0 — Initial Release</span></div>
+      <div class="meta-item"><label>Platform</label><span>.NET MAUI · Android</span></div>
+      <div class="meta-item"><label>Last Updated</label><span>March 2026</span></div>
+      <div class="meta-item"><label>Primary Audience</label><span>Claude Code (AI Agent)</span></div>
+      <div class="meta-item"><label>Architecture</label><span>MVVM · Offline First</span></div>
+    </div>
+  </div>
+  <div class="cover-footer">
+    <span class="cover-footer-left">Confidential — Internal Use Only</span>
+    <div class="cover-footer-tags">
+      <span>Architecture</span><span>Data Model</span><span>Modules</span><span>Business Rules</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ██████████████████████ TABLE OF CONTENTS ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">Contents</div>
+    <h1 class="pg">Table of Contents</h1>
+    <p class="pg-desc">14 sections — fully self-contained and implementation-ready for Claude Code.</p>
+
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">1</div><div><div class="toc-lbl">Project Overview</div><div class="toc-sub">App goal, core principles, single-user model</div></div></div><span class="toc-pg">3</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">2</div><div><div class="toc-lbl">Architecture Overview</div><div class="toc-sub">System layers, MVVM responsibilities, module interaction diagram</div></div></div><span class="toc-pg">3</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">3</div><div><div class="toc-lbl">Technology Stack</div><div class="toc-sub">Framework, database, NuGet packages, IDE</div></div></div><span class="toc-pg">4</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">4</div><div><div class="toc-lbl">Project Structure</div><div class="toc-sub">Folder layout, file naming, DI registration point</div></div></div><span class="toc-pg">4</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">5</div><div><div class="toc-lbl">Data Model</div><div class="toc-sub">ERD, all table schemas, column types and constraints</div></div></div><span class="toc-pg">5</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">6</div><div><div class="toc-lbl">Module Specifications</div><div class="toc-sub">7 modules — flows, rules, and display logic for each</div></div></div><span class="toc-pg">6</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">7</div><div><div class="toc-lbl">Service Layer Contracts</div><div class="toc-sub">All service method signatures with input/output types</div></div></div><span class="toc-pg">8</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">8</div><div><div class="toc-lbl">Navigation &amp; Screen Map</div><div class="toc-sub">Shell structure, tab layout, full page hierarchy</div></div></div><span class="toc-pg">9</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">9</div><div><div class="toc-lbl">Business Rules &amp; Constraints</div><div class="toc-sub">RULE-01 through RULE-10, enforced in service layer</div></div></div><span class="toc-pg">9</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">10</div><div><div class="toc-lbl">Data Management Rules</div><div class="toc-sub">Immutability, mutability, datetime storage standard</div></div></div><span class="toc-pg">10</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">11</div><div><div class="toc-lbl">Security Model</div><div class="toc-sub">PIN lock flow, file privacy, failed attempt cooldown</div></div></div><span class="toc-pg">10</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">12</div><div><div class="toc-lbl">Backup &amp; Export System</div><div class="toc-sub">ZIP structure, backup flow, MAUI Share API usage</div></div></div><span class="toc-pg">11</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">13</div><div><div class="toc-lbl">Error Handling Standards</div><div class="toc-sub">ViewModel error pattern, validation rules, no silent swallowing</div></div></div><span class="toc-pg">11</span></div>
+    <div class="toc-item"><div class="toc-left"><div class="toc-num">14</div><div><div class="toc-lbl">MVP Scope Boundary</div><div class="toc-sub">Included vs explicitly excluded — do not implement excluded items</div></div></div><span class="toc-pg">12</span></div>
+
+    <div class="callout info" style="margin-top:24px">
+      <div class="callout-ico">🤖</div>
+      <div class="callout-bd">
+        <div class="callout-ttl">Audience Note — Claude Code</div>
+        <div class="callout-txt">Every section is self-contained and directly actionable. Do not infer intent — follow exactly what is described. If anything is ambiguous, stop and ask before implementing.</div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0</span><span>Page 2</span></div>
+</div>
+
+<!-- ██████████████████████ PAGE 3 — Overview + Architecture ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">§1 &amp; §2 — Overview &amp; Architecture</div>
+    <h1 class="pg">Project Overview &amp; Architecture</h1>
+    <p class="pg-desc">A personal, offline-first health management app for a single user. No cloud dependency in MVP.</p>
+
+    <h2 class="sh">What the App Manages</h2>
+    <table>
+      <thead><tr><th>Domain</th><th>What It Tracks</th></tr></thead>
+      <tbody>
+        <tr><td>Medicines</td><td>Stock, schedule, dose logging, reminders</td></tr>
+        <tr><td>Health Metrics</td><td>Weight, BP, sugar, heart rate, SpO2, temperature</td></tr>
+        <tr><td>Medical Records</td><td>Prescription photos, lab reports, scans (JPG / PDF)</td></tr>
+        <tr><td>Doctor Visits</td><td>Consultation history, diagnoses, follow-ups</td></tr>
+        <tr><td>Timeline</td><td>Unified chronological view of all health events</td></tr>
+      </tbody>
+    </table>
+
+    <h2 class="sh">Core Principles</h2>
+    <div class="rule-grid">
+      <div class="rc"><div class="rc-id">PRINCIPLE 1</div><div class="rc-txt"><strong>Offline First</strong> — 100% functional with no internet. No feature may depend on network access.</div></div>
+      <div class="rc"><div class="rc-id">PRINCIPLE 2</div><div class="rc-txt"><strong>Immutable History</strong> — Records are never deleted or overwritten. Changes produce new records.</div></div>
+      <div class="rc"><div class="rc-id">PRINCIPLE 3</div><div class="rc-txt"><strong>Single User</strong> — No login, no accounts. All data belongs to one person on one device.</div></div>
+      <div class="rc"><div class="rc-id">PRINCIPLE 4</div><div class="rc-txt"><strong>Data Separation</strong> — Binary files → file storage. SQLite stores structured data only. Never raw bytes in DB.</div></div>
+    </div>
+
+    <h2 class="sh">System Layers</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">Architecture Diagram</span></div>
+      <div class="code-bd"><span class="hl">┌─────────────────────────────────────────┐
+│              UI Layer                   │
+│  XAML Views  ←→  ViewModels (MVVM)      │
+└─────────────────┬───────────────────────┘
+                  │ calls
+┌─────────────────▼───────────────────────┐
+│            Service Layer                │
+│ MedicineService │ MetricsService │ ...  │
+└─────────────────┬───────────────────────┘
+                  │ reads/writes
+┌─────────────────▼───────────────────────┐
+│          Data Access Layer              │
+│      Repository classes per entity      │
+└──────────┬──────────────────────┬───────┘
+           │                      │
+┌──────────▼──────┐    ┌──────────▼──────┐
+│   SQLite DB     │    │  File Storage   │
+│  healthapp.db   │    │  /HealthApp/    │
+└─────────────────┘    └─────────────────┘</span></div>
+    </div>
+
+    <h2 class="sh">MVVM Layer Responsibilities</h2>
+    <table>
+      <thead><tr><th>Layer</th><th>Responsibility</th><th>Hard Constraints</th></tr></thead>
+      <tbody>
+        <tr><td>View</td><td>Display only. Binds to ViewModel properties.</td><td>No logic, no DB, no file I/O</td></tr>
+        <tr><td>ViewModel</td><td>Holds UI state, calls Services, handles commands.</td><td>No direct DB access</td></tr>
+        <tr><td>Model</td><td>Plain data classes mirroring DB columns.</td><td>No methods, pure data only</td></tr>
+        <tr><td>Service</td><td>Business logic. Calls Repositories. Enforces rules.</td><td>No UI dependencies</td></tr>
+        <tr><td>Repository</td><td>Database CRUD only. Returns Model objects.</td><td>SQL only, no business logic</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0</span><span>Page 3</span></div>
+</div>
+
+<!-- ██████████████████████ PAGE 4 — Stack + Structure ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">§3 &amp; §4 — Technology Stack &amp; Project Structure</div>
+    <h1 class="pg">Tech Stack &amp; Folder Layout</h1>
+
+    <h2 class="sh">Technology Decisions</h2>
+    <table>
+      <thead><tr><th>Concern</th><th>Technology</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>App Framework</td><td>.NET MAUI</td><td>C# native, cross-platform, SQLite support built-in</td></tr>
+        <tr><td>Language</td><td>C#</td><td>Primary developer language</td></tr>
+        <tr><td>Local Database</td><td>SQLite via sqlite-net-pcl</td><td>Lightweight, offline, single-file, zero config</td></tr>
+        <tr><td>Notifications</td><td>Plugin.LocalNotification</td><td>Offline-capable, scheduled, no server needed</td></tr>
+        <tr><td>Charts</td><td>Microcharts</td><td>Lightweight health trend line charts</td></tr>
+        <tr><td>File Storage</td><td>FileSystem.AppDataDirectory</td><td>Platform-safe path, private to the app</td></tr>
+        <tr><td>IDE</td><td>Visual Studio 2022</td><td>Primary development environment</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout rule">
+      <div class="callout-ico">📦</div>
+      <div class="callout-bd">
+        <div class="callout-ttl">Required NuGet Packages</div>
+        <div class="callout-txt"><span class="mono">sqlite-net-pcl</span> &nbsp;·&nbsp; <span class="mono">SQLitePCLRaw.bundle_green</span> &nbsp;·&nbsp; <span class="mono">Plugin.LocalNotification</span> &nbsp;·&nbsp; <span class="mono">Microcharts.Maui</span></div>
+      </div>
+    </div>
+
+    <h2 class="sh">Project Folder Structure</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">File Tree</span></div>
+      <div class="code-bd"><span class="hl">HealthTracker/</span>
+├── <span class="kw">Models/</span>           <span class="cm">← Plain data classes. Mirror DB columns. No logic.</span>
+│   ├── Medicine.cs
+│   ├── MedicineSchedule.cs
+│   ├── MedicineLog.cs
+│   ├── HealthMetric.cs
+│   ├── MedicalReport.cs
+│   ├── DoctorVisit.cs
+│   └── TimelineEntry.cs
+│
+├── <span class="kw">Repositories/</span>     <span class="cm">← DB CRUD only. SQL lives here. No business logic.</span>
+│   ├── BaseRepository.cs
+│   ├── MedicineRepository.cs
+│   ├── MedicineLogRepository.cs
+│   ├── HealthMetricRepository.cs
+│   ├── MedicalReportRepository.cs
+│   └── DoctorVisitRepository.cs
+│
+├── <span class="kw">Services/</span>         <span class="cm">← Business logic. Calls Repositories. Enforces rules.</span>
+│   ├── DatabaseService.cs    <span class="cm">← DB init &amp; connection</span>
+│   ├── MedicineService.cs
+│   ├── ReminderService.cs
+│   ├── MetricsService.cs
+│   ├── ReportService.cs
+│   ├── DoctorService.cs
+│   ├── TimelineService.cs
+│   └── BackupService.cs
+│
+├── <span class="kw">ViewModels/</span>       <span class="cm">← UI state + commands. Calls Services only.</span>
+├── <span class="kw">Views/</span>            <span class="cm">← XAML only. Zero code-behind logic.</span>
+├── <span class="kw">Helpers/</span>          <span class="cm">← FileStorageHelper · DateTimeHelper · ValidationHelper</span>
+├── <span class="kw">Constants/</span>        <span class="cm">← AppConstants.cs · MetricTypes.cs (enums)</span>
+└── MauiProgram.cs        <span class="cm">← All DI registrations go here</span></div>
+    </div>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0</span><span>Page 4</span></div>
+</div>
+
+<!-- ██████████████████████ PAGE 5 — Data Model ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">§5 — Data Model</div>
+    <h1 class="pg">Database Schema &amp; ERD</h1>
+    <p class="pg-desc">All structured data lives in SQLite. Images/PDFs live in file storage. The DB stores only file paths.</p>
+
+    <h2 class="sh">Entity Relationship Diagram</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">ERD</span></div>
+      <div class="code-bd"><span class="hl">Medicine</span> ──1:N──► <span class="hl">MedicineSchedule</span>
+  (Id)              (MedicineId FK)
+
+<span class="hl">Medicine</span> ──1:N──► <span class="hl">MedicineLog</span>
+  (Id)              (MedicineId FK, ScheduleId FK)
+
+<span class="hl">DoctorVisit</span> ──1:N──► <span class="hl">MedicalReport</span>
+    (Id)               (DoctorVisitId FK — nullable)
+
+<span class="hl">HealthMetric</span>  ── no FK relationships, standalone ──</div>
+    </div>
+
+    <h2 class="sh">Core Table Schemas</h2>
+    <h3 class="ssh">Medicine</h3>
+    <table>
+      <thead><tr><th>Column</th><th>Type</th><th>Constraint / Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Id</td><td>INTEGER</td><td>PRIMARY KEY AUTOINCREMENT</td></tr>
+        <tr><td class="mono">Name</td><td>TEXT</td><td>NOT NULL</td></tr>
+        <tr><td class="mono">Dosage / DosageUnit</td><td>REAL / TEXT</td><td>NOT NULL — e.g. 500, "mg"</td></tr>
+        <tr><td class="mono">StockCount / StockUnit</td><td>REAL / TEXT</td><td>NOT NULL — e.g. 30, "tablets"</td></tr>
+        <tr><td class="mono">StartDate / EndDate</td><td>TEXT</td><td>"YYYY-MM-DD" — EndDate nullable (null = indefinite)</td></tr>
+        <tr><td class="mono">IsActive</td><td>INTEGER</td><td>NOT NULL, DEFAULT 1 — (0 = inactive)</td></tr>
+        <tr><td class="mono">CreatedAt</td><td>TEXT</td><td>NOT NULL — ISO 8601 datetime</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="ssh">MedicineLog</h3>
+    <table>
+      <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">MedicineId / ScheduleId</td><td>INTEGER</td><td>FK to Medicine and MedicineSchedule — NOT NULL</td></tr>
+        <tr><td class="mono">TakenAt / ScheduledFor</td><td>TEXT</td><td>Actual time vs planned time (ISO datetime)</td></tr>
+        <tr><td class="mono">WasTaken</td><td>INTEGER</td><td>1 = taken · 0 = skipped or missed</td></tr>
+        <tr><td class="mono">StockBefore / StockAfter</td><td>REAL</td><td>Stock snapshot before and after this event</td></tr>
+        <tr><td class="mono">SkipReason</td><td>TEXT</td><td>NULLABLE — user reason if skipped, "Missed" if auto-logged</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="ssh">HealthMetric</h3>
+    <table>
+      <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">MetricType</td><td>TEXT</td><td>Weight · BloodPressure · HeartRate · BloodSugar · SpO2 · Temperature</td></tr>
+        <tr><td class="mono">Value</td><td>REAL</td><td>Primary reading. For BP = systolic.</td></tr>
+        <tr><td class="mono">SecondValue</td><td>REAL</td><td>NULLABLE. For BloodPressure = diastolic only.</td></tr>
+        <tr><td class="mono">Unit</td><td>TEXT</td><td>e.g. "kg" · "mmHg" · "bpm" · "mg/dL" · "%" · "°C"</td></tr>
+        <tr><td class="mono">RecordedAt</td><td>TEXT</td><td>User-specified datetime of the reading</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="ssh">MedicalReport</h3>
+    <table>
+      <thead><tr><th>Column</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">DoctorVisitId</td><td>NULLABLE FK — links report to a visit (optional)</td></tr>
+        <tr><td class="mono">ReportType</td><td>Lab · Prescription · Xray · Scan · Other</td></tr>
+        <tr><td class="mono">FilePath</td><td>NOT NULL — absolute local path to file on device</td></tr>
+        <tr><td class="mono">FileType</td><td>"jpg" · "png" · "pdf" only</td></tr>
+        <tr><td class="mono">ReportDate</td><td>NOT NULL — "YYYY-MM-DD"</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0</span><span>Page 5</span></div>
+</div>
+
+<!-- ██████████████████████ PAGE 6 — Modules ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">§6 — Module Specifications</div>
+    <h1 class="pg">Module Specifications</h1>
+    <p class="pg-desc">7 modules, each implemented as a Service + ViewModel + View set. All flows begin in the ViewModel.</p>
+
+    <div class="mod-grid">
+      <div class="mc"><div class="mc-ico">💊</div><div class="mc-name">Medicine Mgmt</div><div class="mc-desc">Add, schedule, log doses, deduct stock automatically.</div></div>
+      <div class="mc"><div class="mc-ico">🔔</div><div class="mc-name">Reminder System</div><div class="mc-desc">Local push notifications per dose. Fully offline.</div></div>
+      <div class="mc"><div class="mc-ico">📊</div><div class="mc-name">Health Metrics</div><div class="mc-desc">Record 6 metric types with validation ranges.</div></div>
+      <div class="mc"><div class="mc-ico">📈</div><div class="mc-name">Charts &amp; Trends</div><div class="mc-desc">Line charts per metric. Last 30 entries. Dual-line for BP.</div></div>
+      <div class="mc"><div class="mc-ico">🗂</div><div class="mc-name">Reports</div><div class="mc-desc">Store &amp; view JPG, PNG, PDF with metadata. Camera + picker.</div></div>
+      <div class="mc"><div class="mc-ico">🏥</div><div class="mc-name">Doctor Visits</div><div class="mc-desc">Log consultations, diagnoses, follow-ups, attached reports.</div></div>
+    </div>
+
+    <h2 class="sh">6.1 Medicine Management — Dose Flow</h2>
+    <div class="flow">
+      <div class="fstep"><div class="fnum">1</div><div><div class="ftitle">User adds a medicine</div><div class="fdetail">Name, dosage, stock, start/end date, instructions, 1+ schedule times</div></div></div>
+      <div class="fstep"><div class="fnum">2</div><div><div class="ftitle">MedicineService.AddMedicine() called</div><div class="fdetail">Validates → saves Medicine row → saves MedicineSchedule rows → calls ReminderService.ScheduleReminders()</div></div></div>
+      <div class="fstep"><div class="fnum">3</div><div><div class="ftitle">User taps "Take Now"</div><div class="fdetail">MedicineService.LogDoseTaken(medicineId, scheduleId) is called</div></div></div>
+      <div class="fstep"><div class="fnum">4</div><div><div class="ftitle">Stock deducted automatically</div><div class="fdetail">StockCount = StockCount − DoseAmount. MedicineLog created with WasTaken=1, StockBefore/After recorded.</div></div></div>
+    </div>
+
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">Stock Rules</span></div>
+      <div class="code-bd"><span class="cm">// Deduct only when WasTaken = 1</span>
+StockCount = StockCount - DoseAmount
+
+<span class="cm">// NEVER go below zero — warn + confirm before logging</span>
+<span class="kw">if</span> (StockCount &lt; DoseAmount) → warn user, require confirmation
+
+<span class="cm">// Low stock warning badge threshold</span>
+<span class="kw">if</span> (StockCount &lt;= DoseAmount × <span class="num">5</span>) → show warning badge
+
+<span class="cm">// Skipped doses: log created, stock unchanged</span>
+WasTaken = <span class="num">0</span> → StockCount stays the same</div>
+    </div>
+
+    <h2 class="sh">6.2 Reminder System</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">Notification Rules</span></div>
+      <div class="code-bd"><span class="cm">// Unique notification ID formula</span>
+NotificationId = MedicineId × <span class="num">1000</span> + ScheduleId
+
+<span class="cm">// On every app launch — re-register all active reminders</span>
+ReminderService.RescheduleAll()
+
+<span class="cm">// Cancel reminders when any of these occur:</span>
+<span class="cm">//  · Medicine.IsActive set to 0</span>
+<span class="cm">//  · Medicine.EndDate has passed</span>
+<span class="cm">//  · A specific schedule time is deleted</span>
+<span class="cm">//  · User manually disables reminders</span></div>
+    </div>
+
+    <h2 class="sh">6.3 Health Metrics — Validation Ranges</h2>
+    <table>
+      <thead><tr><th>MetricType</th><th>Unit</th><th>Allowed Range</th><th>Fields</th></tr></thead>
+      <tbody>
+        <tr><td>Weight</td><td>kg</td><td>1.0 – 500.0</td><td>Value only</td></tr>
+        <tr><td>BloodPressure</td><td>mmHg</td><td>Sys: 50–300 · Dia: 30–200</td><td>Value + SecondValue</td></tr>
+        <tr><td>HeartRate</td><td>bpm</td><td>20 – 300</td><td>Value only</td></tr>
+        <tr><td>BloodSugar</td><td>mg/dL</td><td>10 – 1000</td><td>Value only</td></tr>
+        <tr><td>SpO2</td><td>%</td><td>50 – 100</td><td>Value only</td></tr>
+        <tr><td>Temperature</td><td>°C</td><td>25.0 – 45.0</td><td>Value only</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn">
+      <div class="callout-ico">⛔</div>
+      <div class="callout-bd"><div class="callout-ttl">Do NOT silently clamp values</div><div class="callout-txt">Values outside range must be <strong>rejected</strong> with inline error under the input field. Never use popups for validation errors.</div></div>
+    </div>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0</span><span>Page 6</span></div>
+</div>
+
+<!-- ██████████████████████ PAGE 7 — Modules cont. ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">§6 continued — Reports, Visits &amp; Timeline</div>
+    <h1 class="pg">Module Specifications (cont.)</h1>
+
+    <h2 class="sh">6.5 Medical Reports — File Handling</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">Storage Paths &amp; Naming</span></div>
+      <div class="code-bd">Base: FileSystem.AppDataDirectory/HealthApp/
+
+Subfolders:
+  /reports/         <span class="cm">← lab reports</span>
+  /prescriptions/   <span class="cm">← prescription photos</span>
+  /scans/           <span class="cm">← X-rays and imaging</span>
+  /other/           <span class="cm">← everything else</span>
+
+Naming convention:
+  {ReportType}_{ReportDate}_{Guid}.{ext}
+
+  <span class="str">Lab_2026-03-06_a3f9c112.jpg</span>
+  <span class="str">Prescription_2026-02-14_bb124e77.pdf</span>
+
+Accepted: .jpg · .jpeg · .png · .pdf
+Rejected: all others → show <span class="str">"Unsupported file type"</span> error</div>
+    </div>
+
+    <div class="flow">
+      <div class="fstep"><div class="fnum">1</div><div><div class="ftitle">User selects source</div><div class="fdetail">Camera capture OR File Picker</div></div></div>
+      <div class="fstep"><div class="fnum">2</div><div><div class="ftitle">User fills metadata</div><div class="fdetail">Title, type, doctor, hospital, date, notes (all optional except title)</div></div></div>
+      <div class="fstep"><div class="fnum">3</div><div><div class="ftitle">ReportService.SaveReport() called</div><div class="fdetail">Copies file → verifies copy succeeded → saves MedicalReport DB record with absolute FilePath</div></div></div>
+      <div class="fstep"><div class="fnum">4</div><div><div class="ftitle">View report</div><div class="fdetail">JPG/PNG → full-screen in-app viewer &nbsp;|&nbsp; PDF → device PDF viewer via intent</div></div></div>
+    </div>
+
+    <h2 class="sh">6.6 Doctor Visit — List Display Rules</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">Display Logic</span></div>
+      <div class="code-bd">Sort: VisitDate DESC (most recent first)
+
+Each row shows:
+  - DoctorName               <span class="cm">← always shown</span>
+  - Hospital                 <span class="cm">← if provided</span>
+  - VisitDate                <span class="cm">← formatted display</span>
+  - Diagnosis preview        <span class="cm">← first 60 chars, truncated</span>
+  - FollowUpDate badge       <span class="cm">← only if FollowUpDate is in the future</span></div>
+    </div>
+
+    <h2 class="sh">6.7 Health Timeline — Event Sources &amp; Build Logic</h2>
+    <table>
+      <thead><tr><th>Source</th><th>Event Type</th><th>Display Label</th></tr></thead>
+      <tbody>
+        <tr><td>DoctorVisit</td><td class="mono">doctor_visit</td><td>Doctor Visit</td></tr>
+        <tr><td>MedicalReport</td><td class="mono">report_added</td><td>Report Added</td></tr>
+        <tr><td>HealthMetric</td><td class="mono">metric_recorded</td><td>Health Metric</td></tr>
+        <tr><td>MedicineLog (taken)</td><td class="mono">dose_taken</td><td>Dose Taken</td></tr>
+        <tr><td>MedicineLog (missed)</td><td class="mono">dose_missed</td><td>Dose Missed</td></tr>
+        <tr><td>Medicine (new)</td><td class="mono">medicine_added</td><td>Medicine Added</td></tr>
+      </tbody>
+    </table>
+    <div class="callout info">
+      <div class="callout-ico">📋</div>
+      <div class="callout-bd"><div class="callout-ttl">Build Logic</div><div class="callout-txt">Query all 5 sources independently → merge into one list → sort by date DESC → apply pagination (pageSize, offset). Group in UI by month-year header. Use <span class="mono">TimelineService.GetTimeline(pageSize, offset)</span>.</div></div>
+    </div>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0</span><span>Page 7</span></div>
+</div>
+
+<!-- ██████████████████████ PAGE 8 — Services + Nav ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">§7 &amp; §8 — Service Contracts &amp; Navigation</div>
+    <h1 class="pg">Service Signatures &amp; Screen Map</h1>
+
+    <h2 class="sh">Service Method Signatures</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">C# — MedicineService</span></div>
+      <div class="code-bd"><span class="kw">Task</span>&lt;Medicine&gt;        AddMedicine(name, dosage, dosageUnit, stock, stockUnit,
+                               startDate, endDate, instructions, notes,
+                               schedules: List&lt;(string time, double dose)&gt;)
+<span class="kw">Task</span>&lt;List&lt;Medicine&gt;&gt;  GetAllActiveMedicines()
+<span class="kw">Task</span>&lt;Medicine&gt;        GetMedicineById(<span class="kw">int</span> id)
+<span class="kw">Task</span>                  DeactivateMedicine(<span class="kw">int</span> id)  <span class="cm">← sets IsActive=0, cancels reminders</span>
+<span class="kw">Task</span>&lt;MedicineLog&gt;    LogDoseTaken(<span class="kw">int</span> medicineId, <span class="kw">int</span> scheduleId)
+<span class="kw">Task</span>&lt;MedicineLog&gt;    LogDoseSkipped(<span class="kw">int</span> medicineId, <span class="kw">int</span> scheduleId, <span class="kw">string</span> reason)
+<span class="kw">Task</span>&lt;List&lt;Log&gt;&gt;      GetLogsForMedicine(<span class="kw">int</span> id, DateTime from, DateTime to)</div>
+    </div>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">C# — MetricsService · ReportService · ReminderService · TimelineService</span></div>
+      <div class="code-bd"><span class="cm">// MetricsService</span>
+<span class="kw">Task</span>&lt;HealthMetric&gt;                AddMetric(type, value, secondValue?, unit, recordedAt, notes)
+<span class="kw">Task</span>&lt;HealthMetric?&gt;               GetLatestByType(<span class="kw">string</span> type)
+<span class="kw">Task</span>&lt;List&lt;HealthMetric&gt;&gt;          GetHistoryByType(<span class="kw">string</span> type, <span class="kw">int</span> count = <span class="num">30</span>)
+<span class="kw">Task</span>&lt;Dictionary&lt;string,Metric?&gt;&gt;  GetAllLatest()
+
+<span class="cm">// ReportService</span>
+<span class="kw">Task</span>&lt;MedicalReport&gt;  SaveReport(srcPath, type, title, fileType, doctor, hospital, date, notes, visitId?)
+<span class="kw">Task</span>                 DeleteReport(<span class="kw">int</span> id)  <span class="cm">← removes DB row AND file from storage</span>
+
+<span class="cm">// ReminderService</span>
+<span class="kw">Task</span>  ScheduleReminders(<span class="kw">int</span> medicineId)
+<span class="kw">Task</span>  CancelReminders(<span class="kw">int</span> medicineId)
+<span class="kw">Task</span>  RescheduleAll()  <span class="cm">← called on every app launch</span>
+
+<span class="cm">// TimelineService</span>
+<span class="kw">Task</span>&lt;List&lt;TimelineEntry&gt;&gt;  GetTimeline(<span class="kw">int</span> pageSize = <span class="num">20</span>, <span class="kw">int</span> offset = <span class="num">0</span>)</div>
+    </div>
+
+    <h2 class="sh">Navigation — Shell &amp; Screen Hierarchy</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">Screen Map</span></div>
+      <div class="code-bd">Shell (Bottom Tab Bar — 5 tabs)
+  ├── <span class="hl">[Tab 1]</span> Medicines
+  │     ├── MedicineListPage
+  │     │     └── <span class="arr">→</span> MedicineDetailPage (tap)
+  │     │               └── <span class="arr">→</span> AddMedicinePage (edit)
+  │     └── <span class="arr">→</span> AddMedicinePage (FAB — new)
+  │
+  ├── <span class="hl">[Tab 2]</span> Metrics
+  │     ├── MetricsDashboardPage
+  │     │     └── <span class="arr">→</span> MetricHistoryPage (tap card)
+  │     └── <span class="arr">→</span> AddMetricPage (FAB)
+  │
+  ├── <span class="hl">[Tab 3]</span> Reports
+  │     ├── ReportsPage
+  │     └── <span class="arr">→</span> AddReportPage (FAB)
+  │
+  ├── <span class="hl">[Tab 4]</span> Doctors
+  │     ├── DoctorVisitsPage
+  │     │     └── <span class="arr">→</span> DoctorVisitDetailPage (tap)
+  │     └── <span class="arr">→</span> AddDoctorVisitPage (FAB)
+  │
+  └── <span class="hl">[Tab 5]</span> Timeline  ── read-only ──
+
+Settings (gear icon in Shell header)
+  └── SettingsPage → PIN setup · Backup &amp; Export · About</div>
+    </div>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0</span><span>Page 8</span></div>
+</div>
+
+<!-- ██████████████████████ PAGE 9 — Rules + Data Rules + Security ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">§9, §10 &amp; §11 — Business Rules, Data Rules &amp; Security</div>
+    <h1 class="pg">Rules &amp; Security Model</h1>
+
+    <h2 class="sh">Business Rules — Enforced in Service Layer Only</h2>
+    <div class="rule-grid">
+      <div class="rc"><div class="rc-id">RULE-01</div><div class="rc-txt">A medicine cannot have zero schedule times. Minimum 1 schedule required before saving.</div></div>
+      <div class="rc am"><div class="rc-id">RULE-02</div><div class="rc-txt">StockCount must never go below 0. Warn user and require confirmation if insufficient stock.</div></div>
+      <div class="rc"><div class="rc-id">RULE-03</div><div class="rc-txt">Every MedicineLog must reference a valid MedicineId and ScheduleId. No orphan logs.</div></div>
+      <div class="rc am"><div class="rc-id">RULE-04</div><div class="rc-txt">HealthMetric values must pass range validation before saving. See §6.3 for all ranges.</div></div>
+      <div class="rc"><div class="rc-id">RULE-05</div><div class="rc-txt">MedicalReport.FilePath must point to a file that exists. Verify copy succeeded before saving record.</div></div>
+      <div class="rc"><div class="rc-id">RULE-06</div><div class="rc-txt">DoctorVisit.FollowUpDate, if provided, must be today or a future date. Reject past dates.</div></div>
+      <div class="rc rd"><div class="rc-id">RULE-07</div><div class="rc-txt">MedicineLog records are NEVER deleted. They are permanent, immutable historical records.</div></div>
+      <div class="rc rd"><div class="rc-id">RULE-08</div><div class="rc-txt">HealthMetric records are NEVER deleted. Each entry is immutable once saved.</div></div>
+      <div class="rc"><div class="rc-id">RULE-09</div><div class="rc-txt">Setting Medicine.IsActive = 0 must immediately cancel ALL reminders for that medicine.</div></div>
+      <div class="rc am"><div class="rc-id">RULE-10</div><div class="rc-txt">On every app launch, ReminderService.RescheduleAll() must be called to survive device reboots.</div></div>
+    </div>
+
+    <h2 class="sh">Data Mutability Rules</h2>
+    <table>
+      <thead><tr><th>Table</th><th>Rule</th><th>What's Allowed</th></tr></thead>
+      <tbody>
+        <tr><td>MedicineLog</td><td><span class="pill r">Immutable</span></td><td>Never UPDATE or DELETE rows</td></tr>
+        <tr><td>HealthMetric</td><td><span class="pill r">Immutable</span></td><td>Never UPDATE or DELETE rows</td></tr>
+        <tr><td>Medicine</td><td><span class="pill a">Mutable</span></td><td>Allow UPDATE (stock, IsActive). Never hard DELETE.</td></tr>
+        <tr><td>DoctorVisit</td><td><span class="pill a">Mutable</span></td><td>Can add notes, follow-up date. Never hard DELETE.</td></tr>
+        <tr><td>MedicalReport</td><td><span class="pill g">Deletable</span></td><td>Hard delete allowed — remove DB row AND file.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout rule">
+      <div class="callout-ico">📅</div>
+      <div class="callout-bd"><div class="callout-ttl">DateTime Storage Standard</div><div class="callout-txt">Date only: <span class="mono">"YYYY-MM-DD"</span> &nbsp;·&nbsp; Datetime: <span class="mono">"YYYY-MM-DDTHH:mm:ss"</span> &nbsp;·&nbsp; Always parse with <span class="mono">DateTime.Parse(s, CultureInfo.InvariantCulture)</span></div></div>
+    </div>
+
+    <h2 class="sh">Security — PIN Lock Flow</h2>
+    <div class="flow">
+      <div class="fstep"><div class="fnum">1</div><div><div class="ftitle">App launches cold</div><div class="fdetail">Check SecureStorage (platform keychain) for configured PIN</div></div></div>
+      <div class="fstep"><div class="fnum">2</div><div><div class="ftitle">No PIN → go to Shell normally</div><div class="fdetail">User can configure a 4–6 digit PIN at any time in Settings</div></div></div>
+      <div class="fstep"><div class="fnum">3</div><div><div class="ftitle">PIN configured → show full-screen blocking overlay</div><div class="fdetail">Shell not accessible until correct PIN entered. Resume from background &lt;2min skips check.</div></div></div>
+      <div class="fstep"><div class="fnum">4</div><div><div class="ftitle">5 failed attempts → 30-second cooldown</div><div class="fdetail">Input disabled during cooldown. Timer displayed. All files in AppDataDirectory — private to app.</div></div></div>
+    </div>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0</span><span>Page 9</span></div>
+</div>
+
+<!-- ██████████████████████ PAGE 10 — Backup + Errors + MVP ██████████████████████ -->
+<div class="page">
+  <div class="pg-stripe"></div>
+  <div class="pg-body">
+    <div class="sec-tag">§12, §13 &amp; §14 — Backup, Error Handling &amp; MVP Scope</div>
+    <h1 class="pg">Backup, Errors &amp; MVP Scope</h1>
+
+    <h2 class="sh">Backup File Structure &amp; Flow</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">ZIP Structure &amp; BackupService Flow</span></div>
+      <div class="code-bd"><span class="hl">HealthBackup_2026-03-06.zip</span>
+├── healthapp.db
+└── files/
+    ├── reports/
+    ├── prescriptions/
+    ├── scans/
+    └── other/
+
+<span class="cm">// BackupService.CreateBackup()</span>
+<span class="arr">→</span> Create temp folder
+<span class="arr">→</span> Copy healthapp.db into temp
+<span class="arr">→</span> Copy entire /HealthApp/ file directory to temp/files/
+<span class="arr">→</span> Compress temp folder → .zip with date in filename
+<span class="arr">→</span> Use MAUI Share API (Google Drive, email, etc.)
+<span class="arr">→</span> Delete temp folder after share completes</div>
+    </div>
+
+    <h2 class="sh">Error Handling — ViewModel Pattern</h2>
+    <div class="code">
+      <div class="code-hd"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span class="code-lang">C# — Standard ViewModel Error Pattern</span></div>
+      <div class="code-bd"><span class="cm">// Every ViewModel exposes these 3 observable properties:</span>
+<span class="kw">bool</span>   HasError      { <span class="kw">get</span>; <span class="kw">set</span>; }
+<span class="kw">string</span> ErrorMessage  { <span class="kw">get</span>; <span class="kw">set</span>; }
+<span class="kw">bool</span>   IsBusy        { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+<span class="cm">// All service calls in ViewModels follow this exact pattern:</span>
+IsBusy = <span class="kw">true</span>;   HasError = <span class="kw">false</span>;
+<span class="kw">try</span> {
+    <span class="kw">await</span> _service.DoSomething();
+} <span class="kw">catch</span> (Exception ex) {
+    HasError = <span class="kw">true</span>;
+    ErrorMessage = <span class="str">"A friendly message for the user"</span>;
+    <span class="cm">// Log full exception details internally</span>
+} <span class="kw">finally</span> {
+    IsBusy = <span class="kw">false</span>;
+}</div>
+    </div>
+    <div class="callout warn" style="margin-bottom:16px">
+      <div class="callout-ico">⚠️</div>
+      <div class="callout-bd"><div class="callout-ttl">Error Handling Rules</div><div class="callout-txt">Never silently swallow exceptions. File I/O errors → user-friendly message, no crash. Validation errors → inline under input field, never popups. Notification failures → log only, do not block the save flow.</div></div>
+    </div>
+
+    <h2 class="sh">MVP Scope Boundary</h2>
+    <div class="scope-wrap">
+      <div class="scope-box inc">
+        <div class="scope-ttl">✅ Included in MVP</div>
+        <div class="scope-row"><span>✅</span>Medicine add / view / deactivate</div>
+        <div class="scope-row"><span>✅</span>Multi-time daily schedule setup</div>
+        <div class="scope-row"><span>✅</span>Dose logging — taken &amp; skipped</div>
+        <div class="scope-row"><span>✅</span>Automatic stock tracking</div>
+        <div class="scope-row"><span>✅</span>Low stock warning badge</div>
+        <div class="scope-row"><span>✅</span>Offline local push notifications</div>
+        <div class="scope-row"><span>✅</span>Missed dose auto-logging on launch</div>
+        <div class="scope-row"><span>✅</span>6 health metric types with validation</div>
+        <div class="scope-row"><span>✅</span>Line charts per metric (Microcharts)</div>
+        <div class="scope-row"><span>✅</span>Report upload — camera + file picker</div>
+        <div class="scope-row"><span>✅</span>Report viewer — image &amp; PDF</div>
+        <div class="scope-row"><span>✅</span>Doctor visit logging &amp; detail view</div>
+        <div class="scope-row"><span>✅</span>Report attachment to visits</div>
+        <div class="scope-row"><span>✅</span>Unified health timeline (paginated)</div>
+        <div class="scope-row"><span>✅</span>PIN app lock (SecureStorage)</div>
+        <div class="scope-row"><span>✅</span>Backup export via MAUI Share API</div>
+      </div>
+      <div class="scope-box exc">
+        <div class="scope-ttl">❌ Not in MVP — Do Not Implement</div>
+        <div class="scope-row"><span>❌</span>Cloud sync of any kind</div>
+        <div class="scope-row"><span>❌</span>Multiple user profiles</div>
+        <div class="scope-row"><span>❌</span>Backup restore flow</div>
+        <div class="scope-row"><span>❌</span>Database encryption</div>
+        <div class="scope-row"><span>❌</span>Biometric unlock</div>
+        <div class="scope-row"><span>❌</span>Medicine interaction warnings</div>
+        <div class="scope-row"><span>❌</span>Blood test reference ranges</div>
+        <div class="scope-row"><span>❌</span>Report OCR / text extraction</div>
+        <div class="scope-row"><span>❌</span>Backend API or server</div>
+        <div class="scope-row"><span>❌</span>Follow-up date notifications</div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-foot"><span class="foot-brand">💊 HealthTracker</span><span>Developer Handbook v1.0 — End of Document</span><span>Page 10</span></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HealthTracker.Views.AddDoctorVisitPage"
+             Title="Add Visit">
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="12">
+
+            <Label Text="Scan Prescription" FontAttributes="Bold" FontSize="15" TextColor="#E67E22"/>
+            <Frame BorderColor="#E67E22" CornerRadius="8" Padding="12">
+                <StackLayout Spacing="8">
+                    <Label Text="Take a photo or pick an image of a prescription to auto-fill visit details."
+                           TextColor="#5A7A9A" FontSize="12"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="Pick Image" Command="{Binding PickImageCommand}"
+                                BackgroundColor="#E67E22" TextColor="White" FontSize="13"/>
+                        <Button Grid.Column="1" Text="Take Photo" Command="{Binding CaptureImageCommand}"
+                                BackgroundColor="#E67E22" TextColor="White" FontSize="13"/>
+                    </Grid>
+                    <Label Text="Scanning prescription with AI..." IsVisible="{Binding IsScanning}"
+                           TextColor="#E67E22" FontSize="12" HorizontalOptions="Center"/>
+                    <Grid IsVisible="{Binding HasImage}" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="Prescription image attached" TextColor="#145A32"
+                               FontSize="12" VerticalOptions="Center" FontAttributes="Italic"/>
+                        <Button Grid.Column="1" Text="Remove" Command="{Binding RemoveImageCommand}"
+                                BackgroundColor="#922B21" TextColor="White" FontSize="11"
+                                HeightRequest="30" Padding="8,0"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <Label Text="Doctor Name" FontAttributes="Bold"/>
+            <Entry Text="{Binding DoctorName}" Placeholder="e.g. Dr. Smith"/>
+
+            <Label Text="Hospital (optional)" FontAttributes="Bold"/>
+            <Entry Text="{Binding Hospital}" Placeholder="e.g. City Hospital"/>
+
+            <Label Text="Visit Date" FontAttributes="Bold"/>
+            <DatePicker Date="{Binding VisitDate}"/>
+
+            <Label Text="Diagnosis (optional)" FontAttributes="Bold"/>
+            <Editor Text="{Binding Diagnosis}" Placeholder="Describe diagnosis..." HeightRequest="80"/>
+
+            <Label Text="Notes (optional)" FontAttributes="Bold"/>
+            <Editor Text="{Binding Notes}" Placeholder="Additional notes..." HeightRequest="60"/>
+
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                <CheckBox Grid.Column="0" IsChecked="{Binding HasFollowUp}"/>
+                <Label Grid.Column="1" Text="Set follow-up date" VerticalOptions="Center"/>
+            </Grid>
+
+            <StackLayout IsVisible="{Binding HasFollowUp}" Spacing="8">
+                <Label Text="Follow-up Date" FontAttributes="Bold"/>
+                <DatePicker Date="{Binding FollowUpDate}"/>
+            </StackLayout>
+
+            <Label Text="{Binding ErrorMessage}" TextColor="Red" IsVisible="{Binding HasError}" FontSize="13"/>
+            <Button Text="Save Visit" Command="{Binding SaveCommand}" BackgroundColor="#1B5FA8" TextColor="White"/>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

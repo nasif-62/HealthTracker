@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>HealthTracker Project Documentation</title>
+<style>
+@page { size: A4; margin: 20mm 16mm 20mm 16mm; }
+:root { --ink:#1b2430; --muted:#56657a; --accent:#1b5fa8; --border:#d9e2ef; --bg:#f4f8fc; }
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink)}
+body{font-family:'Segoe UI',Calibri,Arial,sans-serif;line-height:1.55;font-size:11pt}
+.container{max-width:900px;margin:0 auto;padding:28px 30px;background:#fff;border:1px solid var(--border)}
+h1{font-size:26pt;line-height:1.2;margin:0 0 10px;color:var(--accent);border-bottom:2px solid var(--border);padding-bottom:12px}
+h2{font-size:16pt;margin:20px 0 10px;color:#0f3f72;border-left:4px solid var(--accent);padding-left:10px}
+h3{font-size:13pt;margin:14px 0 8px;color:#173b63}
+p{margin:8px 0}
+ul,ol{margin:6px 0 10px 24px}
+li{margin:3px 0}
+code{font-family:Consolas,'Courier New',monospace;background:#f3f6fb;padding:1px 4px;border-radius:3px}
+hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+table{border-collapse:collapse;width:100%;margin:10px 0}
+th,td{border:1px solid var(--border);padding:6px 8px;text-align:left}
+th{background:#eef4fb}
+.footer{margin-top:18px;padding-top:8px;border-top:1px solid var(--border);font-size:9pt;color:var(--muted)}
+</style>
+</head>
+<body>
+  <div class='container'>
+    <h1 id="healthtracker-project-logic-documentation">HealthTracker Project Logic Documentation</h1>
+<h2 id="project-scope">1) Project Scope</h2>
+<p>HealthTracker is an offline-first personal health app built with .NET MAUI. The project focuses on medicine management, dose tracking, health metrics, doctor visits, report storage/scanning, timeline/history views, AI-assisted extraction/chat, backup/export, and app-level PIN lock.</p>
+<p>Primary solution files:</p>
+<ul>
+<li><code>HealthTracker/HealthTracker.sln</code></li>
+<li><code>HealthTracker/HealthTracker.csproj</code> (main app, Android target)</li>
+<li><code>HealthTracker.Tests/HealthTracker.Tests.csproj</code> (unit tests)</li>
+</ul>
+<h2 id="technical-architecture">2) Technical Architecture</h2>
+<p>Architecture style:</p>
+<ul>
+<li>MVVM: <code>Views</code> + <code>ViewModels</code></li>
+<li>Service layer for business logic</li>
+<li>Repository layer for persistence</li>
+<li>SQLite local storage via <code>sqlite-net-pcl</code></li>
+<li>Dependency Injection configured in <code>MauiProgram.cs</code></li>
+</ul>
+<p>Dependency flow:</p>
+<ul>
+<li>View -&gt; ViewModel -&gt; Service -&gt; Repository -&gt; DatabaseService -&gt; SQLite</li>
+</ul>
+<p>Core registration location:</p>
+<ul>
+<li><code>HealthTracker/MauiProgram.cs</code></li>
+</ul>
+<p>Key external libraries:</p>
+<ul>
+<li><code>Plugin.LocalNotification</code> for reminders</li>
+<li><code>Plugin.Maui.OCR</code> for OCR</li>
+<li><code>QuestPDF</code> for health report PDF generation</li>
+<li><code>Microcharts.Maui</code> for metrics charting</li>
+<li><code>UglyToad.PdfPig</code> for PDF text extraction</li>
+</ul>
+<h2 id="startup-and-app-lifecycle-logic">3) Startup and App Lifecycle Logic</h2>
+<p>Defined in <code>HealthTracker/App.xaml.cs</code>:</p>
+<ul>
+<li>App starts with <code>AppShell</code>.</li>
+<li>On start:</li>
+<li>Requests notification permission.</li>
+<li>Checks Android exact alarm permission (Android 12+), optionally opens settings.</li>
+<li>Reschedules all reminders.</li>
+<li>Enforces PIN lock if PIN exists.</li>
+<li>On sleep: stores background timestamp.</li>
+<li>On resume: if backgrounded &gt;= <code>2</code> minutes (<code>BackgroundResumeThresholdMinutes</code>), enforces PIN lock again.</li>
+</ul>
+<p>Navigation shell and primary tabs are defined in <code>HealthTracker/AppShell.xaml</code>:</p>
+<ul>
+<li>Today</li>
+<li>Metrics</li>
+<li>Reports</li>
+<li>Doctors</li>
+<li>Timeline</li>
+</ul>
+<p>Toolbar actions:</p>
+<ul>
+<li>Ask AI</li>
+<li>Settings</li>
+</ul>
+<h2 id="persistence-and-data-model-logic">4) Persistence and Data Model Logic</h2>
+<p>Database file:</p>
+<ul>
+<li><code>healthapp.db</code> in app data directory (<code>FileStorageHelper.GetDatabasePath()</code>).</li>
+</ul>
+<p>Database initialization and migration:</p>
+<ul>
+<li><code>HealthTracker/Services/DatabaseService.cs</code></li>
+<li>Creates tables for medicines, schedules, logs, courses, metrics, reports, report pages, doctor visits, pending medicines.</li>
+<li>Contains migration logic for legacy columns:</li>
+<li>Removes <code>DoseAmount</code> from <code>MedicineSchedule</code> if present.</li>
+<li>Removes <code>Dosage</code> from <code>Medicine</code> and ensures <code>IsOngoing</code> exists.</li>
+</ul>
+<p>Core model entities:</p>
+<ul>
+<li><code>Medicine</code>: medicine definition, stock, duration/course settings, active flag, sort order.</li>
+<li><code>MedicineSchedule</code>: daily time slots per medicine.</li>
+<li><code>MedicineLog</code>: taken/missed records and stock before/after snapshot.</li>
+<li><code>MedicineCourse</code>: a treatment period with planned vs taken doses.</li>
+<li><code>HealthMetric</code>: metric type/value(s)/timestamp/notes.</li>
+<li><code>DoctorVisit</code>: visit metadata + optional prescription image path.</li>
+<li><code>MedicalReport</code>: report metadata + primary stored file path.</li>
+<li><code>ReportPage</code>: multi-page report file rows.</li>
+<li><code>PendingMedicine</code>: OCR-extracted medicine candidates awaiting approval.</li>
+<li><code>TimelineEntry</code>: aggregated UI event item.</li>
+</ul>
+<p>Repository pattern:</p>
+<ul>
+<li>Base CRUD in <code>Repositories/BaseRepository.cs</code>.</li>
+<li>Per-entity repositories provide query logic (active/inactive medicine, ordered lists, range logs, etc.).</li>
+</ul>
+<h2 id="business-rules-and-validation-logic">5) Business Rules and Validation Logic</h2>
+<p>Key constants in <code>Constants/AppConstants.cs</code> and <code>Constants/MetricTypes.cs</code>.</p>
+<p>Metric validation (<code>Helpers/ValidationHelper.cs</code>):</p>
+<ul>
+<li>Blood pressure uses systolic + diastolic required ranges.</li>
+<li>Other metrics use per-type min/max ranges.</li>
+</ul>
+<p>File type validation (<code>ValidationHelper.IsValidFileType</code>):</p>
+<ul>
+<li>Allowed: <code>jpg</code>, <code>jpeg</code>, <code>png</code>, <code>pdf</code>.</li>
+</ul>
+<p>PIN validation (<code>ValidationHelper.IsValidPin</code>):</p>
+<ul>
+<li>Length: 4 to 6 digits.</li>
+<li>Digits only.</li>
+</ul>
+<p>File storage layout (<code>Helpers/FileStorageHelper.cs</code>):</p>
+<ul>
+<li>Base folder: <code>HealthApp</code> under app data.</li>
+<li>Subfolders by report type: reports, prescriptions, scans, other.</li>
+<li>File naming includes type/date/random suffix.</li>
+</ul>
+<h2 id="core-service-logic">6) Core Service Logic</h2>
+<h3 id="medicineservice-servicesmedicineservice.cs">6.1 MedicineService (<code>Services/MedicineService.cs</code>)</h3>
+<p>Responsibilities:</p>
+<ul>
+<li>Add/edit/delete/deactivate medicines.</li>
+<li>Manage schedules and treatment courses.</li>
+<li>Dose logging and stock reduction.</li>
+<li>Auto-miss logging and course completion checks.</li>
+<li>Adherence stats and backfilling past doses.</li>
+</ul>
+<p>Important behaviors:</p>
+<ul>
+<li>Adding medicine requires at least one schedule.</li>
+<li>If non-ongoing and end date not provided, computes end date from prescribed days.</li>
+<li>Creates initial active course on medicine creation.</li>
+<li>Schedules notifications immediately after add/update/start-new-course.</li>
+<li><code>CheckAndCompleteCourses()</code> completes course and deactivates medicine when end criteria met.</li>
+<li><code>LogDoseTaken()</code> decrements stock by 1, inserts taken log, increments active course <code>TotalTaken</code>.</li>
+<li><code>AutoLogMissedDoses()</code> creates missed logs for yesterday for unlogged schedules and extends end date proportionally.</li>
+<li><code>BackfillPastDoses()</code> inserts taken logs historically up to now (skips future schedule slots) and updates stock/course totals.</li>
+</ul>
+<h3 id="reminderservice-servicesreminderservice.cs">6.2 ReminderService (<code>Services/ReminderService.cs</code>)</h3>
+<p>Responsibilities:</p>
+<ul>
+<li>Schedule and cancel local notifications.</li>
+</ul>
+<p>Behavior:</p>
+<ul>
+<li>Each schedule creates two daily reminders:</li>
+<li>Early reminder at -15 minutes.</li>
+<li>On-time reminder.</li>
+<li>Notification IDs are deterministic from medicine/schedule IDs.</li>
+<li><code>CancelDoseReminders()</code> cancels current reminders for a schedule and immediately reschedules from next day.</li>
+<li><code>RescheduleAll()</code> cancels all notifications then re-schedules active, non-expired medicines.</li>
+</ul>
+<h3 id="metricsservice-servicesmetricsservice.cs">6.3 MetricsService (<code>Services/MetricsService.cs</code>)</h3>
+<p>Responsibilities:</p>
+<ul>
+<li>Add/read/update/delete health metrics.</li>
+</ul>
+<p>Behavior:</p>
+<ul>
+<li>Enforces metric validation before add/update.</li>
+<li>Exposes latest-by-type, history, and latest snapshot for all metric types.</li>
+</ul>
+<h3 id="reportservice-servicesreportservice.cs">6.4 ReportService (<code>Services/ReportService.cs</code>)</h3>
+<p>Responsibilities:</p>
+<ul>
+<li>Persist report metadata and copy source files into app storage.</li>
+<li>Support single-page and multi-page reports.</li>
+</ul>
+<p>Behavior:</p>
+<ul>
+<li>Validates pages and file types.</li>
+<li>Copies first page as <code>MedicalReport.FilePath</code> primary file.</li>
+<li>Inserts each page into <code>ReportPage</code> table.</li>
+<li>Delete removes all page files and DB rows.</li>
+</ul>
+<h3 id="doctorservice-servicesdoctorservice.cs">6.5 DoctorService (<code>Services/DoctorService.cs</code>)</h3>
+<p>Responsibilities:</p>
+<ul>
+<li>Create/update/delete/get doctor visits.</li>
+</ul>
+<p>Behavior:</p>
+<ul>
+<li>Enforces follow-up date not in past.</li>
+<li>Optional prescription image is copied into app storage on save.</li>
+<li>Delete also removes saved prescription image file if present.</li>
+</ul>
+<h3 id="timelineservice-servicestimelineservice.cs">6.6 TimelineService (<code>Services/TimelineService.cs</code>)</h3>
+<p>Responsibilities:</p>
+<ul>
+<li>Build unified event feed.</li>
+</ul>
+<p>Sources aggregated:</p>
+<ul>
+<li>Doctor visits</li>
+<li>Reports</li>
+<li>Metrics</li>
+<li>Dose logs</li>
+<li>Medicine added</li>
+<li>Course completed</li>
+</ul>
+<p>Behavior:</p>
+<ul>
+<li>Creates <code>TimelineEntry</code> items with tag/icon/color metadata.</li>
+<li>Uses date grouping label <code>MonthYearGroup</code>.</li>
+<li>Sorts descending by <code>SortKey</code> and supports paging (<code>pageSize</code>, <code>offset</code>).</li>
+</ul>
+<h3 id="ocrparser-services">6.7 OCR/Parser Services</h3>
+<p>Prescription parser (<code>Services/PrescriptionParserService.cs</code>):</p>
+<ul>
+<li>OCR text extraction via <code>IOcrService</code>.</li>
+<li>Regex heuristics detect medicine lines, dosage, frequency, and form hints.</li>
+<li>Outputs list of <code>ParsedMedicine</code>.</li>
+</ul>
+<p>Report text parser (<code>Services/ReportTextParserService.cs</code>):</p>
+<ul>
+<li>Extracts doctor, hospital, date, report type, title from OCR text via regex rules.</li>
+</ul>
+<p>PDF text extractor (<code>Services/PdfTextExtractorService.cs</code>):</p>
+<ul>
+<li>Reads text page-by-page from PDF files using PdfPig.</li>
+</ul>
+<h3 id="ai-services">6.8 AI Services</h3>
+<p>AI parser (<code>Services/AiParserService.cs</code>):</p>
+<ul>
+<li>Stores Gemini API key in app <code>Preferences</code> (<code>gemini_api_key</code>).</li>
+<li>Calls Gemini model endpoint for report/doctor-visit JSON extraction.</li>
+<li>Handles JSON fence cleanup and parse errors.</li>
+</ul>
+<p>AI chat (<code>Services/AiChatService.cs</code>):</p>
+<ul>
+<li>Builds large contextual prompt from local DB data:</li>
+<li>Active/past medicines</li>
+<li>3-day medicine log summary</li>
+<li>Doctor visits</li>
+<li>Recent reports (with PDF text extraction)</li>
+<li>Recent health metrics</li>
+<li>Adds conversation history and user question.</li>
+<li>Calls Gemini and returns response text.</li>
+</ul>
+<h3 id="backup-and-export">6.9 Backup and Export</h3>
+<p>Backup service (<code>Services/BackupService.cs</code>):</p>
+<ul>
+<li>Creates temp folder in cache.</li>
+<li>Copies database + files directory.</li>
+<li>Zips and triggers system share sheet.</li>
+</ul>
+<p>Health report service (<code>Services/HealthReportService.cs</code>):</p>
+<ul>
+<li>Generates styled PDF summary with QuestPDF.</li>
+<li>Sections include medicines, logs, visits, metrics, reports.</li>
+<li>Optional embedding of report files/images.</li>
+<li>On Android, can render PDF pages to images before embedding.</li>
+<li>Warns when generated report exceeds 50MB.</li>
+</ul>
+<h2 id="viewmodel-logic-ui-behavior">7) ViewModel Logic (UI Behavior)</h2>
+<h3 id="today-flow">7.1 Today Flow</h3>
+<p><code>TodayViewModel</code>:</p>
+<ul>
+<li>Loads active medicine schedules for today.</li>
+<li>Runs <code>AutoLogMissedDoses()</code> and <code>CheckAndCompleteCourses()</code> before rendering.</li>
+<li>Skips schedule slots already passed at creation time for medicines created today.</li>
+<li>Sorts schedule cards by urgency/window.</li>
+<li><code>TakeDose</code> checks stock, logs taken dose, cancels/reschedules that schedule reminder.</li>
+</ul>
+<h3 id="medicine-flow">7.2 Medicine Flow</h3>
+<p><code>MedicineListViewModel</code>:</p>
+<ul>
+<li>Loads active medicines with progress, adherence, stock days.</li>
+<li>Loads inactive medicines as past list.</li>
+<li>Loads pending OCR medicines for approval.</li>
+<li>Supports drag-drop reorder and persists <code>SortOrder</code>.</li>
+</ul>
+<p><code>AddMedicineViewModel</code>:</p>
+<ul>
+<li>Validates name, prescribed days, stock, schedule presence.</li>
+<li>Saves medicine + schedules + initial course.</li>
+<li>If start date is in past, offers backfill of past doses.</li>
+</ul>
+<p><code>MedicineDetailViewModel</code>:</p>
+<ul>
+<li>Shows schedules and today log status.</li>
+<li>Shows recent logs and course history summary.</li>
+<li>Allows start new course.</li>
+<li>Allows manual backfill from start date to yesterday.</li>
+</ul>
+<p><code>EditMedicineViewModel</code>:</p>
+<ul>
+<li>Loads medicine + schedules into editable fields.</li>
+<li>Updates medicine/schedules and reminder schedule.</li>
+</ul>
+<h3 id="metrics-flow">7.3 Metrics Flow</h3>
+<p><code>MetricsDashboardViewModel</code>:</p>
+<ul>
+<li>Loads latest/previous values for each metric type.</li>
+<li>Calculates trend text and tile styling.</li>
+</ul>
+<p><code>AddMetricViewModel</code>:</p>
+<ul>
+<li>Creates metric record with per-type validation.</li>
+</ul>
+<p><code>MetricHistoryViewModel</code>:</p>
+<ul>
+<li>Loads up to 30 points, computes latest/min/max text, builds line chart.</li>
+<li>Supports metric deletion.</li>
+</ul>
+<p><code>EditMetricViewModel</code>:</p>
+<ul>
+<li>Updates selected metric with validation.</li>
+</ul>
+<h3 id="report-flow">7.4 Report Flow</h3>
+<p><code>ReportsViewModel</code>:</p>
+<ul>
+<li>Loads reports list and supports deletion.</li>
+</ul>
+<p><code>AddReportViewModel</code>:</p>
+<ul>
+<li>Adds pages from file picker or camera.</li>
+<li>OCR runs for image pages (not PDFs).</li>
+<li>If AI key exists, attempts AI extraction first; falls back to regex parser.</li>
+<li>Auto-fills title/doctor/hospital/type/date when available.</li>
+<li>Saves multi-page report and metadata.</li>
+</ul>
+<h3 id="doctor-visit-flow">7.5 Doctor Visit Flow</h3>
+<p><code>DoctorVisitsViewModel</code> and <code>DoctorVisitDetailViewModel</code>:</p>
+<ul>
+<li>List + detail display with delete/navigation.</li>
+</ul>
+<p><code>AddDoctorVisitViewModel</code>:</p>
+<ul>
+<li>Optional image pick/capture.</li>
+<li>OCR extraction from image.</li>
+<li>AI parsing if configured; fallback regex extraction.</li>
+<li>Saves visit with follow-up/date validations.</li>
+</ul>
+<p><code>EditDoctorVisitViewModel</code>:</p>
+<ul>
+<li>Loads and updates existing visit fields.</li>
+</ul>
+<h3 id="prescription-scan-to-pending">7.6 Prescription Scan to Pending</h3>
+<p><code>ScanPrescriptionViewModel</code>:</p>
+<ul>
+<li>Scans image from gallery/camera.</li>
+<li>OCR + parse medicines.</li>
+<li>User selects entries and saves to <code>PendingMedicine</code> for later review.</li>
+</ul>
+<h3 id="history-and-timeline">7.7 History and Timeline</h3>
+<p><code>HistoryViewModel</code>:</p>
+<ul>
+<li>Category-based history: Medicine, Doctor, Reports.</li>
+<li>Date-range filtering.</li>
+<li>Medicine history includes course overlap logic and progress summaries.</li>
+</ul>
+<p><code>TimelineViewModel</code>:</p>
+<ul>
+<li>Paged timeline loading using <code>TimelineService</code>.</li>
+<li>Prevents duplicate month-group labels across page boundaries.</li>
+</ul>
+<h3 id="security-and-settings">7.8 Security and Settings</h3>
+<p><code>PinLockViewModel</code>:</p>
+<ul>
+<li>Compares entered PIN with secure storage.</li>
+<li>Tracks failed attempts and enforces cooldown after max attempts.</li>
+</ul>
+<p><code>SettingsViewModel</code>:</p>
+<ul>
+<li>Save/remove PIN.</li>
+<li>Save/remove Gemini API key.</li>
+<li>Create backup ZIP.</li>
+<li>Generate PDF health report with/without embedded files.</li>
+<li>Delete all app data with double confirmation.</li>
+</ul>
+<p><code>AskAiViewModel</code>:</p>
+<ul>
+<li>Chat UI state and history management.</li>
+<li>Uses <code>AiChatService</code> only when API key configured.</li>
+</ul>
+<h2 id="android-widget-logic">8) Android Widget Logic</h2>
+<p>Files:</p>
+<ul>
+<li><code>Platforms/Android/HealthWidget.cs</code></li>
+<li><code>Platforms/Android/WidgetDataHelper.cs</code></li>
+</ul>
+<p>Behavior:</p>
+<ul>
+<li>Widget shows:</li>
+<li>Today date</li>
+<li>Dose completion progress</li>
+<li>Next dose text</li>
+<li>Latest heart rate</li>
+<li>Latest blood pressure</li>
+<li>Tap opens app.</li>
+<li>Data is read directly from SQLite in read-only mode.</li>
+</ul>
+<h2 id="routing-and-navigation-logic">9) Routing and Navigation Logic</h2>
+<p>Primary route registration in <code>AppShell.xaml.cs</code> for detail/add/edit pages.</p>
+<p>Main navigation patterns:</p>
+<ul>
+<li>Tab navigation for core modules.</li>
+<li>Push navigation for settings, AI chat, detail/edit forms.</li>
+</ul>
+<h2 id="test-coverage-current">10) Test Coverage (Current)</h2>
+<p>Unit tests exist for:</p>
+<ul>
+<li>Helpers:</li>
+<li>DateTimeHelper</li>
+<li>ValidationHelper</li>
+<li>ViewModels/models:</li>
+<li>BaseViewModel</li>
+<li>MedicineItem</li>
+<li>TodayScheduleItem</li>
+<li>Services:</li>
+<li>MedicineService</li>
+</ul>
+<p>Test project:</p>
+<ul>
+<li><code>HealthTracker.Tests</code></li>
+<li>xUnit + NSubstitute + sqlite-net package references</li>
+</ul>
+<h2 id="data-safety-and-operational-notes">11) Data Safety and Operational Notes</h2>
+<ul>
+<li>App is offline-first and single-user.</li>
+<li>Health data is local SQLite + app-local files.</li>
+<li>No first-party cloud sync logic exists.</li>
+<li>AI features require user-provided Gemini API key and network access to Google endpoint.</li>
+<li>Backup/export and report sharing rely on platform share sheet.</li>
+</ul>
+<h2 id="end-to-end-logic-summary">12) End-to-End Logic Summary</h2>
+<p>Primary critical flows:</p>
+<ul>
+<li>Medicine lifecycle: add -&gt; schedule reminders -&gt; daily logging -&gt; stock/course updates -&gt; auto-complete/deactivate.</li>
+<li>Daily execution: auto-log missed doses + course completion checks + today scheduling/prioritization.</li>
+<li>Metrics lifecycle: validated insert/update -&gt; dashboard trend + history chart.</li>
+<li>Report lifecycle: file capture/pick -&gt; OCR/AI extraction -&gt; stored pages + metadata -&gt; optional embedding in generated health PDF.</li>
+<li>Doctor lifecycle: visit records + optional scanned prescription.</li>
+<li>Security lifecycle: optional PIN lock at startup and long resume gaps.</li>
+<li>Insight lifecycle: timeline/history aggregation + AI Q&amp;A over local data context.</li>
+</ul>
+
+    <div class='footer'>Generated on 2026-03-09 12:39</div>
+  </div>
+</body>
+</html>

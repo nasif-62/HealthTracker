@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:HealthTracker.ViewModels"
+             x:Class="HealthTracker.Views.AskAiPage"
+             Title="Ask AI">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Chat messages -->
+        <CollectionView x:Name="MessagesView" Grid.Row="0"
+                        ItemsSource="{Binding Messages}"
+                        Margin="8,8,8,0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ChatMessage">
+                    <Grid Margin="0,4">
+                        <Frame Padding="12,10" CornerRadius="16" HasShadow="False"
+                               BackgroundColor="{Binding BubbleColor}"
+                               HorizontalOptions="{Binding Alignment}"
+                               MaximumWidthRequest="300">
+                            <Label Text="{Binding Text}"
+                                   TextColor="{Binding TextColor}"
+                                   FontSize="14"
+                                   LineBreakMode="WordWrap"/>
+                        </Frame>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Loading indicator -->
+        <ActivityIndicator Grid.Row="0" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                           Color="#1B5FA8" VerticalOptions="End" Margin="0,0,0,8"/>
+
+        <!-- Input bar -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto"
+              Padding="8,6" ColumnSpacing="6"
+              BackgroundColor="White">
+            <Frame Grid.Column="0" Padding="0" CornerRadius="22" BorderColor="#E0EAF4" HasShadow="False">
+                <Entry Placeholder="Ask about your health data..."
+                       Text="{Binding InputText}"
+                       FontSize="14" Margin="12,0"
+                       ReturnCommand="{Binding SendCommand}"
+                       IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
+            </Frame>
+            <Button Grid.Column="1" Text="Send" FontSize="13"
+                    WidthRequest="64" HeightRequest="44"
+                    CornerRadius="22" BackgroundColor="#1B5FA8" TextColor="White"
+                    Command="{Binding SendCommand}"/>
+            <Button Grid.Column="2" Text="Clear" FontSize="13"
+                    WidthRequest="60" HeightRequest="44"
+                    CornerRadius="22" BackgroundColor="#5A7A9A" TextColor="White"
+                    Command="{Binding ClearCommand}"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>
